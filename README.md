@@ -16,6 +16,10 @@ nice size for programming research.  Other implementations exist in C++ and Pyth
 6) ``cd ..``
 7) ``raco link merkatilo``
 
+_Note that when running the test for the first time, test files are downloaded from another
+github repository and placed in ``/tmp/merkatio-test-data/``.  The same tests are used across equivalent code
+in C++, Racket, and Python._
+
 ## Get some data
 
 You will eventually need a data source.  Time series data are loaded into the system via the ``lo`` operator, e.g. ``(lo 'SPY)``.
