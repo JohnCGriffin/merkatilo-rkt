@@ -13,5 +13,5 @@ merkatilo-test-data: /tmp/merkatilo-test-data/ema-3.txt
 	@test -d /tmp/merkatilo-test-data
 
 test: merkatilo
-	@raco test `fgrep -l rackunit *.rkt core/*.rkt private/*.rkt`
+	@raco test -x . 
 
