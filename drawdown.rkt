@@ -16,60 +16,55 @@
 (define (series-drawdown s #:dates (dts (current-dates)))
   
   (define obs (series->obs dts s))
+  (define r-obs (reverse obs))
 
-  (define reversed-mins
-    (for/fold ((result '()))
-              ((ob (in-list (reverse obs)))
-               #:when (or (null? result)
-                          (< (ob-v ob)
-                             (ob-v (car result)))))
-      (cons ob result)))
+  (define reversed-minima
+    (for/fold ((acc (list (car r-obs))))
+              ((ob (in-list r-obs))
+               #:when (< (ob-v ob)
+                         (ob-v (car acc))))
+      (cons ob acc)))
 
-  (define maxs
-    (reverse (for/fold ((result '()))
-                       ((ob (in-list obs))
-                        #:when (or (null? result)
-                                   (> (ob-v ob)
-                                      (ob-v (car result)))))
-               (cons ob result))))
+  (define maxima
+    (reverse
+     (for/fold ((acc (list (car obs))))
+               ((ob (in-list obs))
+                #:when (> (ob-v ob)
+                          (ob-v (car acc))))
+       (cons ob acc))))
 
+  (define (ob-ratio a b)
+    (/ (ob-v a) (ob-v b)))
 
-  (let loop ((maxs maxs)
-             (mins reversed-mins)
-             (accum (drawdown (car maxs)
-                              (car maxs)))) 
+  (define (and-car p)
+    (and (pair? p) (car p)))
 
-    (let* ((this-max (and (pair? maxs)
-                          (car maxs)))
-           (this-min (and this-max
-                          (pair? mins)
-                          (car mins))))
+  (let loop ((maxima maxima)
+             (minima reversed-minima)
+             (accum (drawdown (car maxima)
+                              (car maxima)))) 
+
+    (let* ((mx (and-car maxima))
+           (mn (and-car minima)))
       
       (cond
         
-        ((not this-min)
+        ((not (and mn mx))
          accum)
 
-        ; drop earlier mins
-        ((<= (ob-d this-min)
-             (ob-d this-max))
-         (loop maxs
-               (cdr mins)
-               accum))
+        ; drop earlier minima
+        ((<= (ob-d mn)
+             (ob-d mx))
+         (loop maxima (cdr minima) accum))
 
         ; found new biggest drawdown
-        ((< (/ (ob-v this-min)
-               (ob-v this-max))
-            (/ (ob-v (drawdown-min accum))
-               (ob-v (drawdown-max accum))))
-         (loop (cdr maxs)
-               mins
-               (drawdown this-max this-min)))
+        ((< (ob-ratio mn mx)
+            (ob-ratio (drawdown-min accum)
+                      (drawdown-max accum)))
+         (loop (cdr maxima) minima (drawdown mx mn)))
 
         (else
-         (loop (cdr maxs)
-               mins
-               accum))))))
+         (loop (cdr maxima) minima accum))))))
 
 
 

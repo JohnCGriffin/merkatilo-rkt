@@ -16,10 +16,14 @@
 (define (series->obs dts s)
   (define dv (dateset-vector dts))
   (define vv (series-dates-values s dv))
-  (for/list ((dt dv)
+  (define result
+    (for/list ((dt dv)
              (val vv)
              #:when val)
-    (observation dt val)))
+      (observation dt val)))
+  (if (pair? result)
+      result
+      (raise-user-error 'series->obs "no observations")))
 
 ; unordered obserations
 (define (obs->series obs #:name (maybe-name #f))
