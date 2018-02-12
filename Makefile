@@ -3,8 +3,11 @@
 merkatilo: merkatilo-test-data
 	@raco make main.rkt chart.rkt
 
+doc:
+	raco setup -l merkatilo
+
 clean:
-	@rm -rf `find . -type d -name compiled`
+	@rm -rf `find . -type d -name compiled` doc
 
 /tmp/merkatilo-test-data/ema-3.txt:
 	@rm -rf /tmp/merkatilo-test-data && (cd /tmp && git clone https://github.com/JohnCGriffin/merkatilo-test-data)
