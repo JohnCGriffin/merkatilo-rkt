@@ -123,12 +123,52 @@ Return the day of the week, 0=Sunday, 6=Saturday.
 
 @section{Date Sets}
 
+A @tt{dateset} is a wrapper around a strictly ascending immutable vector of @tt{jdate?}.
+Many operations require a dateset to traverse, such as @tt{ema}, @tt{sma}, and even
+@tt{dump}.  In general, the @tt{dateset} is optional and usually found through a
+paramter @tt{current_dates}.  Constructing a @tt{dateset} is best done via the
+@tt{dates} operation which flexibly intersects dates associated with series and
+other entities, including other @tt{dateset} instances.
+
 @defstruct*[dateset ([vector vector?])]{
-A structure containing an ordered set of jdate? (i.e. julian integers).  More commonly
+A structure containing an ordered set of @tt{jdate?} (i.e. julian integers).  More commonly
 a user will construct a dateset with the @tt{dates} operator.
 }
 
+@defparam[current-dates dateset dateset?]{
+The current-dates is used throughout the API, although most procedure permit overriding
+it with a @tt{#dates} option.  As with any parameter, @tt{parameterize} can set a scoped
+binding, but an easier way is the @tt{with-dates} macro.
+}
 
+@defproc[(dates [spec any] ... [#:first first jdate? MIN-DATE][#:last last jdate? MAX-DATE]
+[#:union union boolean? #t][#:expanded expanded boolean? #f]) dateset?]{
+Construct a dateset from other entities and constraints.  Usually wanting to work with
+compatible data, the union of the specifications is appropriate. Occasionally, one needs
+full calendar dates with endpoints constrained by the specs; that is handled with @tt{expanded}.
+A typical usage would be:
+
+@racketblock[
+(dates SPY DJIA MSFT #:first '1998-1-1)
+]
+
+This example will find the intersection of SPY, DJIA and MSFT dates starting in 1998.  
+}
+
+@defstruct*[date-range([first optional-jdate?][last optional-jdate?])]{
+Handy specification for date bounds, either end of which can be #f.  A date-range is
+one of the available types to pass to @tt{dates}.
+}
+ 
+@defproc*[([(first-date) jdate?]
+           [(first-date [ dates dateset? ]) jdate?])]{
+First date of specified dates or first date of @tt{current-dates} parameter.		    
+}
+ 
+@defproc*[([(last-date) jdate?]
+           [(last-date [ dates dateset? ]) jdate?])]{
+Last date of specified dates or last date of @tt{current-dates} parameter.		    
+}
 
 @;--------------------------------------
 
