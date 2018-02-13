@@ -56,9 +56,9 @@ Fedeeral Reserve FRED database, OECD, and Quandl.
 
 @section{Dates}
 
-A jdate? is simply an integer between MIN-DATE and MAX-DATE, covering the days of the
-years from 1700 through 2100.  Because it is just an integer, finding the jdate? before or
-after another jdate? is simple.  Common jdate? operations include finding @tt{today}, and
+A @tt{jdate?} is simply an integer in [@tt{MIN-DATE} @tt{MAX-DATE}], covering the days of the
+years from 1700 through 2100.  Because it is just an integer, finding the @tt{jdate?} before or
+after another @tt{jdate?} is simple.  Common @tt{jdate?} operations include finding @tt{today}, and
 transforming from and to text representations.  Also note that "text representation" means
 ISO 8601 YYYY-MM-DD.
 
@@ -66,7 +66,7 @@ ISO 8601 YYYY-MM-DD.
               @defthing[MAX-DATE jdate?])]{
 First and last valid jdate? instances.
 I figure that no finance stuff before 1700 or
-after I die really matters.
+after I die matters enough to generate unit tests for irrelevent values.
 }
 
 @defproc[(today [optional-offset integer?]) jdate?]{
@@ -177,7 +177,11 @@ Last date of specified dates or last date of @tt{current-dates} parameter.
 
 @;--------------------------------------
 
-@section{Series Smoothings}
+@section{Sequenced Series}
+
+Many series generating functions require traversal of a dateset.  These are sequenced series.
+
+@subsection{Series Smoothings}
 
 To dampen daily movements in a series, two common smoothing operations are the simple
 moving average @tt{sma} and the exponential moving average @tt{ema}.  Like other sequential
@@ -208,7 +212,7 @@ The default value for @tt{#:dates} is @tt{(current-dates)}.
 }
 
 
-@section{Signal Generation}
+@subsection{Signal Generation}
 
 Signal series are those that have non-repeating instances of buy and sell signals,
 respectively respresented as 1 and -1.  Building trading models with thise library,
@@ -266,8 +270,110 @@ one can generate signals based upon the periodic momentum of a series as in:
 ]
 }
 
-@;------------------------------------
+@;-----------------------------------
+
+@;-----------SEQUENCED ---------------
 
 
 
 
+
+@section{Unsequenced Series}
+
+When a series can be generated without respect to a dateset, it is unsequenced. These include
+constant-value series, arithmetic on series, and/or logic, filters, mappings and calibration.
+
+@subsection{Arithmetic}
+
+@defproc[(constant [value real?]) series?]{
+A series is created that always responds to a date query with the single @tt{value}.
+}
+
+@defproc[(add [a series-or-real?][b series-or-real?]) series?]{
+Creates a series of the sum of @tt{a} and @tt{b} at each date for which both series
+generate values. If either @tt{a} or @tt{b} is a number, it is converted to a series
+first via @tt{constant}.
+}
+
+@defproc[(sub [a series-or-real?][b series-or-real?]) series?]{
+Analogous to @tt{add}.
+}
+
+@defproc[(mul [a series-or-real?][b series-or-real?]) series?]{
+Analogous to @tt{add}.
+}
+
+@defproc[(div [a series-or-real?][b series-or-real?]) series?]{
+Analogous to @tt{add}, but no value is generated when @tt{b} is zero.
+}
+
+@;-----------------------------
+
+
+@subsection{Inequalities}
+
+@defproc[(gt [a series-or-real?] [b series-or-real?]) series?]{
+   After converting any numeric argument to a series via @tt{constant},
+   the value of @tt{a} is copied to the output series if that value
+   if greater than the value of @tt{b} at that date.  Most commonly,
+   a numeric argument is second as in this example which looks for
+   periods where the 1-year gain is greater than 20%.
+
+@racketblock[
+(gt (mo-days a-price-series 365) 1.2)
+]
+}
+
+@defproc[(ge [a series-or-real?][b series-or-real?]) series?]{
+Analogous to @tt{gt} but uses >=.
+}
+
+@defproc[(lt [a series-or-real?][b series-or-real?]) series?]{
+Analogous to @tt{gt} but uses <.
+}
+
+@defproc[(ge [a series-or-real?][b series-or-real?]) series?]{
+Analogous to @tt{le} but uses <=.
+}
+
+@;------------------------------------------
+
+@subsection{Logical}
+
+@defproc[(series-and [a series?][b series?]) series?]{
+At any date query for which @tt{a} has a value, the output series produces the value produced
+by @tt{b} at that date.
+}
+
+@defproc[(series-or [a series?][b series?]) series?]{
+At any date query for which @tt{a} has a value, that value is returned.  Otherwise, whatever
+is returned by @tt{b} is the response.
+}
+
+@;---------------------------------------------
+
+
+@subsection{Functional}
+
+@defproc[(series-map [proc procedure?][input series?]...[#:missing-data-permitted missing-data-permitted boolean? #f]) series?]{
+The procedure @tt{proc} must handle arity that matches the number of input series, analogous
+to @tt{map} on lists.  Generally, the @tt{missing-data-permitted} option is false. If the
+given mapping procedure handles missing values, then missing-data-permitted should be set true.
+For instance to take the square root of a series:
+
+@racketblock[
+(map-series sqrt my-series)
+]
+}
+
+@defproc[(series-filter [predicate procedure?][input series?]) series?]{
+Each value produced by the input series is passed to the output series unchanged if that value
+passes a predicate function.  For instance, @tt{(gt IBM 100)} is equivalent to
+@racketblock[
+(series-filter (curryr > 100) IBM)
+]
+}
+
+@;--------------------------------------------------
+
+@;-------------- UNSEQUENCED ------------------
