@@ -64,6 +64,10 @@ I figure that no finance stuff before 1700 or
 after I die really matters.
 }
 
+@defproc[(today [optional-offset integer?]) jdate?]{
+@tt{(today)} is today, @tt{(today -1)} is yesterday and
+@tt{(today 2)} is the day after tomorrow.
+}
 
 @defproc[(jdate->text [date jdate?]) string?]{
 Transform a julian date integer to text form.
@@ -85,8 +89,32 @@ The immutable ymd checks its year, month, and day arguments for
 validity.  Typically used with ymd->jdate to construct a jdate?.
 }
 
+@defproc[(ymd->jdate [ymd ymd?]) jdate?]{
+From year, month, and day, create a jdate?
+}
+
 @defproc[(jdate->ymd [date jdate?]) ymd?]{
 Return ymd struct from jdate?.
+}
+
+@defproc[(jdate? [object any]) boolean?]{
+Is this thing a jdate?
+}
+
+@defproc[(jdate-year [date jdate?]) integer?]{
+Return the year.
+}
+
+@defproc[(jdate-month [date jdate?]) integer?]{
+Return the month (1-12).
+}
+
+@defproc[(jdate-day [date jdate?]) integer?]{
+Return the day of month (1-31).
+}
+
+@defproc[(jdate-weekday [date jdate?]) integer?]{
+Return the day of the week, 0=Sunday, 6=Saturday.
 }
 
 
