@@ -3,7 +3,7 @@
 merkatilo: merkatilo-test-data
 	@raco make main.rkt chart.rkt
 
-doc:
+documentation:
 	raco setup -l merkatilo
 
 clean:
