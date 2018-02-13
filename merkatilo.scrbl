@@ -50,7 +50,9 @@ dumps them out in date order, like a dumped spreadsheet.
 Please note that if you attempt to do the example above, it will not work.  That is because
 this library manipulates times series; it does not provide financial data.  You have to come up
 with that yourself.  If you are just studying, investigate using the St. Louis
-Fedeeral Reserve FRED database, OECD, and Quandl.
+Federal Reserve @(hyperlink "https://fred.stlouisfed.org/" "FRED database"),
+@(hyperlink "https://data.oecd.org/" "OECD"), and
+@(hyperlink "https://www.quandl.com/" "Quandl").
 
 @;--------------------------------------
 
@@ -188,10 +190,12 @@ moving average @tt{sma} and the exponential moving average @tt{ema}.  Like other
 operations, a dateset is required to perform the operation.  If not supplied, the
 @tt{current-dates} parameter is used.
 
-@defproc[(ema [input=series series?] [N integer?] [#:dates dates dateset? (current-dates)])
+@defproc[(ema [input-series series?] [N integer?] [#:dates dates dateset? (current-dates)])
 series?]{
-From N, a fraction is derived, F=2/(N+1), requiring N > 1.  Each observation in the output series is that fraction
-F times the value plus (1-F) times the preceding value.  Thus ema(IBM,10) will smooth each price
+From N, a fraction F is derived, F=2/(N+1), requiring N > 1.
+Each observation in the output series is that fraction
+F times the value plus (1-F) times the preceding value.  Thus @tt{ema(IBM,10)}
+will smooth each price
 of IBM such that the current value is weighted 2/11 and 9/11 is multiplied by the previous value.
 The first value or any value following a missing observation is simply the input value.  The number
 of output observations equals the number of input observations. That feature plus the weighting of
@@ -200,7 +204,7 @@ new input heavier than older input makes this a more useful smoothing operator t
 The default value for @tt{#:dates} is @tt{(current-dates)}.
 }
 
-@defproc[(sma [input=series series?] [Period integer?] [#:dates dates dateset? (current-dates)])
+@defproc[(sma [input-series series?] [Period integer?] [#:dates dates dateset? (current-dates)])
 series?]{
 Each output value represents the average of the most current @tt{Period} values.  Until that
 number of values is met, there is no output.  Upon encountering a missing observation, the
