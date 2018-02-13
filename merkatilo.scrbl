@@ -47,6 +47,11 @@ dumps them out in date order, like a dumped spreadsheet.
 (dump SPY smoothed my-signals)
 ]
 
+Please note that if you attempt to do the example above, it will not work.  That is because
+this library manipulates times series; it does not provide financial data.  You have to come up
+with that yourself.  If you are just studying, investigate using the St. Louis
+Fedeeral Reserve FRED database, OECD, and Quandl.
+
 @;--------------------------------------
 
 @section{Dates}
@@ -140,7 +145,7 @@ The current-dates is used throughout the API, although most procedure permit ove
 it with a @tt{#dates} option.  As with any parameter, @tt{parameterize} can set a scoped
 binding, but an easier way is the @tt{with-dates} macro.
 }
-
+ 
 @defproc[(dates [spec any] ... [#:first first jdate? MIN-DATE][#:last last jdate? MAX-DATE]
 [#:union union boolean? #t][#:expanded expanded boolean? #f]) dateset?]{
 Construct a dateset from other entities and constraints.  Usually wanting to work with
@@ -171,4 +176,98 @@ Last date of specified dates or last date of @tt{current-dates} parameter.
 }
 
 @;--------------------------------------
+
+@section{Series Smoothings}
+
+To dampen daily movements in a series, two common smoothing operations are the simple
+moving average @tt{sma} and the exponential moving average @tt{ema}.  Like other sequential
+operations, a dateset is required to perform the operation.  If not supplied, the
+@tt{current-dates} parameter is used.
+
+@defproc[(ema [input=series series?] [N integer?] [#:dates dates dateset? (current-dates)])
+series?]{
+From N, a fraction is derived, F=2/(N+1), requiring N > 1.  Each observation in the output series is that fraction
+F times the value plus (1-F) times the preceding value.  Thus ema(IBM,10) will smooth each price
+of IBM such that the current value is weighted 2/11 and 9/11 is multiplied by the previous value.
+The first value or any value following a missing observation is simply the input value.  The number
+of output observations equals the number of input observations. That feature plus the weighting of
+new input heavier than older input makes this a more useful smoothing operator than @tt{sma}.
+
+The default value for @tt{#:dates} is @tt{(current-dates)}.
+}
+
+@defproc[(sma [input=series series?] [Period integer?] [#:dates dates dateset? (current-dates)])
+series?]{
+Each output value represents the average of the most current @tt{Period} values.  Until that
+number of values is met, there is no output.  Upon encountering a missing observation, the
+output average will be delayed again.  The maximum number of output values in the produced
+series is therefore (Period-1) less than the input.  This function matches what most people
+expect of a moving average.  Otherwise, @tt{ema} is a generally better choice.
+
+The default value for @tt{#:dates} is @tt{(current-dates)}.
+}
+
+
+@section{Signal Generation}
+
+Signal series are those that have non-repeating instances of buy and sell signals,
+respectively respresented as 1 and -1.  Building trading models with thise library,
+one strives to find signal generation that says something like "Buy low, sell high."
+By passing any manipulated series through @tt{to-signals}, any sequence of values will
+be translated into non-repeating -1 for negative values and 1 for non-negative values.
+
+A very common signal is a cross, generating a signal as one series moves above or below
+another.  The press often talks of a market index passing its 200-day moving average as
+an important event.  By the way, "200-day" in the press usually means 200 market days,
+not calendar days.
+
+Reversals identify when a series has experienced a drop after a local peak or risen after
+a local trough.
+
+@defproc[(cross [#:slower slower series?]
+[#:faster faster series?]
+[#:upside-factor upside-factor number? 1.0]
+[#:downside-factor downside-factor number? 1.0]
+[#:dates dates dateset? current-dates]) series?]{
+When the faster series surpasses the slower series, a buy signal (1) fires
+and a sell (-1) when it goes below.  These boundaries are altered with
+upside-factor and downside-factor.  For instance, the following
+generates signals then the SPY ETF price series passes 1% above and 1% below
+its 200-period average.
+
+@racketblock[
+(cross #:slower (sma SPY 200) #:faster SPY #:upside-factor 1.01 #:downside-factor .99)
+]
+                                         }
+
+@defproc[(reversals [s series?][#:down-factor down-factor number?][#:up-factor up-factor number?][#:dates dates dateset? current-dates]) series?]{
+When a series ascends above up-factor multiplied by a preceding local minimum, a buy (1) signal is produced.  Upon descending below the product of a local maximum and down-factor, a sell (-1) signal is produced.  For instance, if you want to get out of the stock market after 15% corrections and back in after 10% reversal back up.
+
+@racketblock[
+(reversals DJIA #:down-factor .85 #:up-factor 1.1)
+]
+
+It is worth checking out various combinations of this strategy as a confirmation of the soundness of buy-hold.
+}
+
+@defproc[(conviction [input-signals series?][periods integer?][#:dates dates dateset current-dates]) series?]{
+The conviction operator reduces whipsaw signals by delaying the signal then producing it only if
+it is not flipped with the specified number of periods.  As a small side benefit, any practical
+trading strategy receives a "heads-up" that a signal is imminent.
+}
+
+@defproc[(to-signals [series series?][#:dates dates dateset current-dates]) series?]{
+Any series that generates positive and negative numbers indicating buys and sells respectively
+may be converted to a proper signal series (non-repeated sparse 1 and -1 values).  For instance,
+one can generate signals based upon the periodic momentum of a series as in:
+
+@racketblock[
+(to-signals (mo-days IBM 365))
+]
+}
+
+@;------------------------------------
+
+
+
 
