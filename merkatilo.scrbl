@@ -11,7 +11,7 @@
 @section{Background}
 
  After having creating a considerable amount of very fast, complete, and huge
- technical analysis tools in Java, C++ and Zentech, I just wanted something simple.
+ technical analysis tools in a hybrid of C++ and Python, I just wanted something simple.
  Thus, the merkatilo
  libraries are
  my most-used subset of functionality in single language implementations.
@@ -455,7 +455,7 @@ there.
     about 55% back in 2008, so its drawdown-residual is about 0.45.
 }
 
-@defproc[(investment-performance [investment series?][#:alternate-investment alternative-investment series? constant][#:signals signals series? #f][#:dates dates dateset? current-dates]) performance?]{
+@defproc[(investment-performance [investment series?][#:alternate-investment alternate-investment series? constant][#:signals signals series? #f][#:dates dates dateset? current-dates]) performance?]{
 Return the performance structure of trading scheme (trading racket?) based upon signals or
 simply return the performance of buy/hold if no signals are supplied.
 }
@@ -473,7 +473,7 @@ loader returns the series.  A supplied default loader reads from ASCII files in
 @tt{~/TIME_SERIES}.
 }
 
-defproc[(lo [id symbol-or-string?]) series?]{
+@defproc[(lo [id symbol-or-string?]) series?]{
 Given an id such as @tt{'SPY}, @tt{"SPY"}, @tt{'SPY::HIGH}, or @tt{"IBM::OPEN"}, return a series.
 }
 
