@@ -7,7 +7,8 @@
 ;; awaiting a -1 signal to exit the invested position.
 
 
-(require "private/common-requirements.rkt")
+(require "private/common-requirements.rkt"
+	 "first-last-ob.rkt")
 
 (provide
  (contract-out
@@ -28,6 +29,11 @@
   (define sig-v (series-dates-values signals dv))
   (define-values (fd out-v)
     (dates-appropriate-fd-and-vec dts))
+  (define first-sig-date
+    (let ((ob (first-ob signals #:dates dts)))
+      (if ob
+	  (ob-d ob)
+	  (raise-user-error 'equity-line "missing first signal"))))
 
   (define (oops msg dt)
     (raise-user-error 'equity-line msg (jdate->text dt)))
@@ -46,6 +52,7 @@
       (cond
        ((not inv) (oops "missing investment observation at ~a" dt))
        ((not alt) (oops "missing alternative investment observation at ~a" dt))
+       ((<= dt first-sig-date) 1.0)
        (buy? (if prev-inv (/ inv prev-inv) 1.0))
        (else (if prev-alt (/ alt prev-alt) 1.0))))
 
