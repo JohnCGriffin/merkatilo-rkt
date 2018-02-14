@@ -108,7 +108,7 @@
 
   (check-equal?
    (approx (performance-volatility-residual nostradamus-performance))
-   (approx 0.928082998778216))
+   (approx 0.9278986478200268))
 
   (check-equal?
    (approx (performance-drawdown-residual nostradamus-performance))
@@ -116,7 +116,7 @@
 
   (check-equal?
    (approx (performance-annualized-gain nostradamus-performance))
-   (approx 0.4809298292293325))
+   (approx 0.48833476551658905))
 
   (check-equal?
    (performance-long-ratio nostradamus-performance)
