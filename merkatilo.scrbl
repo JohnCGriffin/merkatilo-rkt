@@ -420,7 +420,10 @@ there.
     at its price (the value of the series at that signal date), resulting in shares.  Upon
     a sell signal, the shares are liquidated and used to purchase the alternate investment at
     its price.  With @tt{initial-value} at its default of 100, the value of the output series
-    should the accumulated percentage value related to the original investment.
+    should the accumulated percentage value related to the original investment.  Until the
+    first signal is encountered, funds are idle, invested in neither the primary nor alternate
+    investment.  A graphed equity line will therefore always start with a flat zone before
+    the first signal, as funds are in neither in the primary nor alternate investments.
 
     The output of @tt{equity-line} is what you will likely use with the performance measures
     of gain, drawdown and volatility.
