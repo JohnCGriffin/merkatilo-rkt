@@ -29,11 +29,7 @@
   (define sig-v (series-dates-values signals dv))
   (define-values (fd out-v)
     (dates-appropriate-fd-and-vec dts))
-  (define first-sig-date
-    (let ((ob (first-ob signals #:dates dts)))
-      (if ob
-	  (ob-d ob)
-	  (raise-user-error 'equity-line "missing first signal"))))
+  (define first-sig-date (ob-d (first-ob signals #:dates dts)))
 
   (define (oops msg dt)
     (raise-user-error 'equity-line msg (jdate->text dt)))

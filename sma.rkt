@@ -65,7 +65,7 @@
      (series-count TEST-SERIES))
 
     (check-equal?
-     (last-value (sma TEST-SERIES 3))
+     (ob-v (last-ob (sma TEST-SERIES 3)))
      (/ (+ 340 337 337) 3.0))))
 
   

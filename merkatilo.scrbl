@@ -481,11 +481,9 @@ Given an id such as @tt{'SPY}, @tt{"SPY"}, @tt{'SPY::HIGH}, or @tt{"IBM::OPEN"},
 }
 
 @defproc*[([(first-ob [s series?][#:dates dates dateset current-dates]) observation?]
-           [(first-value [s series?][#:dates dates dateset current-dates]) real?]
-	   [(last-ob [s series?][#:dates dates dateset current-dates]) observation?]
-	   [(last-value [s series?][#:dates dates dateset current-dates]) real?])]{
+	   [(last-ob [s series?][#:dates dates dateset current-dates]) observation?])]{
 	   @tt{first-ob} delivers the first valid observation in a series while @tt{first-value}
-	   returns that observation's value.  @tt{last-ob} and @tt{last-value} are analogous.
+	   returns that observation's value. 
 }
 
 @defproc*[([(min-max-obs [s series?][#:dates dates dateset current-dates]) (values observation? observation?)]

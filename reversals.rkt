@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt")
+(require "private/common-requirements.rkt"
+         "first-last-ob.rkt")
 
 (provide
  (contract-out
@@ -18,13 +19,10 @@
   (define up-factor (exact->inexact _up-factor))
   (define-values (dv vv fd out-v) (common-setup s dts))
 
-  (define first-ob (for/first ((dt (in-vector dv))
-                               (val (in-vector vv))
-                               #:when val)
-                     (observation dt val)))
+  (define initial-ob (first-ob s #:dates dts))
 
-  (for/fold ((_min-ob first-ob)
-             (_max-ob first-ob)
+  (for/fold ((_min-ob initial-ob)
+             (_max-ob initial-ob)
              (state #f))
             ((dt (in-vector dv))
              (val (in-vector vv))
