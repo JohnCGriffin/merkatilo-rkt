@@ -1,5 +1,5 @@
 # merkatilo-rkt
-Merkatilo implemented in Racket - online API available at [merkatilo.org](http://merkatilo.org/merkatilo-rkt/index.html).
+Merkatilo implemented in Racket - [API doc](http://merkatilo.org/merkatilo-rkt/index.html).
 
 ## Purpose
 
