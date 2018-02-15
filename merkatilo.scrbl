@@ -10,18 +10,23 @@
 
 @section{Background}
 
- After having creating a considerable amount of very fast, complete, and huge
- technical analysis tools in a hybrid of C++ and Python, I just wanted something simple.
+ After having creating a considerable amount of very fast, but complicated
+ technical analysis tools in a hybrid of C++ and Python, I aimed for simplicity
+ and minimalism.
  Thus, the merkatilo
  libraries are
  my most-used subset of functionality in single language implementations.
- This is the Racket implementation.
+ This is the Racket implementation. 
+
+The code resides at @(hyperlink "https://github.com/JohnCGriffin/merkatilo-rkt" "Github") under MIT licensing.
+
+John Griffin, griffinish at gmail
  
 @;--------------------------------------
 
 @section{Overview}
 
-The basic data structures are a Time Series structure that wraps a simple date-to-number
+The basic data structures are a time series structure that wraps a simple date-to-number
 function, a date, and a dateset which is an ordered collection of dates.  A time series is represented by struct @tt{series} which takes only a date->optional-number function and a name.  It
 is the argument to many functions that beget new @tt{series} instances.
 

@@ -6,11 +6,11 @@ merkatilo: merkatilo-test-data
 documentation:
 	raco setup -l merkatilo && echo '.navsettop { display:none }' >> doc/manual-style.css
 
-doc.tar: documentation
-	(cd doc && tar cf ../doc.tar .)
+rkt-doc.tar: documentation
+	(cd doc && tar cf ../rkt-doc.tar .)
 
 clean:
-	@rm -rf `find . -type d -name compiled` doc doc.tar
+	@rm -rf `find . -type d -name compiled` doc rkt-doc.tar
 
 /tmp/merkatilo-test-data/ema-3.txt:
 	@rm -rf /tmp/merkatilo-test-data && (cd /tmp && git clone https://github.com/JohnCGriffin/merkatilo-test-data)
