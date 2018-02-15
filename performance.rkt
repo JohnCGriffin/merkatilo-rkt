@@ -29,7 +29,7 @@
             (last-ob s #:dates dts)))
   (define days (- (ob-d lo) (ob-d fo)))
   (define gain (/ (ob-v lo) (ob-v fo)))
-  (define years (/ days 365.25))
+  (define years (/ days 365.2425))
   (- (expt gain (/ 1 years)) 1))
 
 
@@ -104,7 +104,7 @@
 
   (check-equal?
    (approx (gpa TEST-SERIES #:dates (dates TEST-SERIES)))
-   0.076885298)
+   (approx 0.07688365986138823))
 
   (check-equal?
    (approx (performance-volatility-residual nostradamus-performance))
@@ -116,7 +116,7 @@
 
   (check-equal?
    (approx (performance-annualized-gain nostradamus-performance))
-   (approx 0.48833476551658905))
+   (approx 0.48832261262864174))
 
   (check-equal?
    (performance-long-ratio nostradamus-performance)

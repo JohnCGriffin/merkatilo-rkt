@@ -82,7 +82,7 @@ For instance, 2451545 -> "2001-01-01".
 }
 
 @defproc[(text->jdate [date-text string?]) jdate?]{
-Parse and ISO 8601 YYYY-MM-DD text string into a jdate?.  The content
+Parse an ISO 8601 YYYY-MM-DD text string into a jdate?.  The content
 will be verified as a legal date or raise and exception.
 }
 
@@ -131,7 +131,7 @@ Return the day of the week, 0=Sunday, 6=Saturday.
 @section{Date Sets}
 
 A @tt{dateset} is a wrapper around a strictly ascending immutable vector of @tt{jdate?}.
-Many operations require a dateset to traverse, such as @tt{ema}, @tt{sma}, and even
+Many operations require a dateset to traverse, such as @tt{ema}, @tt{sma}, and 
 @tt{dump}.  In general, the @tt{dateset} is optional and usually found through a
 paramter @tt{current_dates}.  Constructing a @tt{dateset} is best done via the
 @tt{dates} operation which flexibly intersects dates associated with series and
@@ -186,8 +186,8 @@ Many series generating functions require traversal of a dateset.  These are sequ
 @subsection{Series Smoothings}
 
 To dampen daily movements in a series, two common smoothing operations are the simple
-moving average @tt{sma} and the exponential moving average @tt{ema}.  Like other sequential
-operations, a dateset is required to perform the operation.  If not supplied, the
+moving average, @tt{sma}, and the exponential moving average, @tt{ema}.  As with other sequential
+operations, a dateset is required.  If not supplied, the
 @tt{current-dates} parameter is used.
 
 @defproc[(ema [input-series series?] [N integer?] [#:dates dates dateset? (current-dates)])
@@ -314,7 +314,8 @@ A series is created that always responds to a date query with the single @tt{val
 @defproc[(add [a series-or-real?][b series-or-real?]) series?]{
 Creates a series of the sum of @tt{a} and @tt{b} at each date for which both series
 generate values. If either @tt{a} or @tt{b} is a number, it is converted to a series
-first via @tt{constant}.
+first via @tt{constant}.  Thus, these two expressions are equivalent:
+@tt{(add some-series 1)} and @tt{(add some-series (constant 1))}
 }
 
 @defproc[(sub [a series-or-real?][b series-or-real?]) series?]{
@@ -403,16 +404,17 @@ passes a predicate function.  For instance, @tt{(gt IBM 100)} is equivalent to
 @section{Performance Measures}
 
 If you are developing signals, you must be interested in how "good" those
-signals are.  Good means many things to many people; sometimes it's simply
-the total money earned over the lifetime of a model and others value risk
-avoidance.  That goodness factor is likely constructed from a combination
+signals are.  Good means many things to many people; some value 
+the total money earned over the lifetime of a model, while others value risk
+avoidance.  That quantification of goodness is likely constructed from a combination
 of aiming for low return volatility, high returns and mimimizing unrealized
 losses.
 
 Finally, to apply trading signals to what you consider to be goodness,
 you will need to build an equity line representing the
-value of a series after trading according to those signals.  Thus, start
-there.
+value of a series after trading according to those signals. That functionality
+if provided by @tt{equity-line}.
+
 
 @defproc[(equity-line [input series?][signals series?][#:init initial-value real? 100][#:alternate-investment alternate-investment optional-series? constant-value-1][#:dates dates dateset current-dates]) series?]{
     If an alternate investment is not specified, it is set to @tt{(constant 1)} and funds are
@@ -430,8 +432,8 @@ there.
 }
 
 @defstruct*[drawdown ([max observation?][min observation?])]{
-  Drawdown contains two observations, the earlier one being the max observation and
-  the later one being a lesser valued observation such that that combination of
+  Drawdown contains two observations, the earlier being the max observation and
+  the latter being a lesser valued observation such that that combination of
   observed date-value pairs represents the greatest loss in value.
 }
 
@@ -446,8 +448,7 @@ there.
 }
 
 @defproc[(gpa [input series?][#:dates dates dateset current-dates]) real?]{
-   Calculating the fractional years separating the first and last dates of the series,
-   return the annualized gain @tt{(expt gain (/ years))}.
+   Gain per annum is calculated as @italic{gains@superscript{(1/Y)}-1} where Y=days/365.2425.
 }
 
 @defstruct*[performance ([volatility-residual real?][drawdown-residual real?][annualized-gain real?][long-ratio real?][trades integer?])]{
