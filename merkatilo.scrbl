@@ -34,7 +34,7 @@ is the argument to many functions that beget further
 Series creations come in two styles, those requiring 
 a sequence of dates, a @tt{dateset}, and those that do not.  For example, the @tt{sma}
 procedure creates a new series representing a running average of the input series over a
-@tt{dateset}.  However, @tt{add} adds two input series on a date without reference to a
+@tt{dateset}.  However, @tt{add} sums two input series on a date without reference to a
 date sequence.
 
 Speaking of dates, with merkatilo, they are called @tt{jdate}, meaning julian date.  The
@@ -212,8 +212,8 @@ F times the value plus (1-F) times the preceding value.  Thus @tt{ema(IBM,10)}
 will smooth each price
 of IBM such that the current value is weighted 2/11 and 9/11 is multiplied by the previous value.
 The first value or any value following a missing observation is simply the input value.  The number
-of output observations equals the number of input observations. That feature plus the weighting of
-new input heavier than older input makes this a more useful smoothing operator than @tt{sma}.
+of output observations equals the number of input observations. That feature plus stronger weighting of newer
+input makes @tt{ema} more useful than @tt{sma}.
 
 The default value for @tt{#:dates} is @tt{(current-dates)}.
 }
