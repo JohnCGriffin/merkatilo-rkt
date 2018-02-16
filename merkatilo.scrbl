@@ -28,12 +28,13 @@ John Griffin, griffinish at gmail
 
 The basic data structures are a time series structure that wraps a simple date-to-number
 function, a date, and a dateset which is an ordered collection of dates.  A time series is represented by struct @tt{series} which takes only a date->optional-number function and a name.  It
-is the argument to many functions that beget new @tt{series} instances.
+is the argument to many functions that beget further
+@tt{series} instances.
 
-The functions operating transforming series to new series come in two styles, those oriented
-to a sequence of dates, and those that require no @tt{dateset}.  For example, the @tt{sma}
-procedure creates a new series representing a running average of the input series over some
-@tt{dateset}.  However, @tt{add} adds two input series on a date without respect to any
+Series creations come in two styles, those requiring 
+a sequence of dates, a @tt{dateset}, and those that do not.  For example, the @tt{sma}
+procedure creates a new series representing a running average of the input series over a
+@tt{dateset}.  However, @tt{add} adds two input series on a date without reference to a
 date sequence.
 
 Speaking of dates, with merkatilo, they are called @tt{jdate}, meaning julian date.  The
@@ -54,7 +55,7 @@ dumps them out in date order, like a dumped spreadsheet.
 
 Please note that if you attempt to do the example above, it will not work.  That is because
 this library manipulates times series; it does not provide financial data.  You have to come up
-with that yourself.  If you are just studying, investigate using the St. Louis
+with that yourself.  If you have no data source, investigate using the St. Louis
 Federal Reserve @(hyperlink "https://fred.stlouisfed.org/" "FRED database"),
 @(hyperlink "https://data.oecd.org/" "OECD"), and
 @(hyperlink "https://www.quandl.com/" "Quandl").
@@ -67,7 +68,8 @@ A @tt{jdate?} is simply an integer in [@tt{MIN-DATE} @tt{MAX-DATE}], covering th
 years from 1700 through 2100.  Because it is just an integer, finding the @tt{jdate?} before or
 after another @tt{jdate?} is simple.  Common @tt{jdate?} operations include finding @tt{today}, and
 transforming from and to text representations.  Also note that "text representation" means
-ISO 8601 YYYY-MM-DD.
+ISO 8601 YYYY-MM-DD.  Text output includes zero-padded month and days for single-digit values; all text output
+of @tt{jdate?} is ten characters in length.
 
 @deftogether[(@defthing[MIN-DATE jdate?]
               @defthing[MAX-DATE jdate?])]{
@@ -88,7 +90,7 @@ For instance, 2451545 -> "2001-01-01".
 
 @defproc[(text->jdate [date-text string?]) jdate?]{
 Parse an ISO 8601 YYYY-MM-DD text string into a jdate?.  The content
-will be verified as a legal date or raise and exception.
+will be verified as a legal date or raise an exception.
 }
 
 @defproc[(->jdate [date-like string?/symbol?/jdate?]) jdate?]{
@@ -97,20 +99,20 @@ a jdate?, it passes through.
 }
 
 @defstruct*[ymd ([year integer?][month integer?][day integer?])]{
-The immutable ymd checks its year, month, and day arguments for
-validity.  Typically used with ymd->jdate to construct a jdate?.
+The immutable @tt{ymd} checks its year, month, and day arguments for
+validity.  Typically used with @tt{ymd->jdate} to construct a @tt{jdate?}.
 }
 
 @defproc[(ymd->jdate [ymd ymd?]) jdate?]{
-From year, month, and day, create a jdate?
+From year, month, and day, create a @tt{jdate?}.
 }
 
 @defproc[(jdate->ymd [date jdate?]) ymd?]{
-Return ymd struct from jdate?.
+Return a @tt{ymd?} from jdate?.
 }
 
 @defproc[(jdate? [object any]) boolean?]{
-Is this thing a jdate?
+Is this thing a @tt{jdate?}
 }
 
 @defproc[(jdate-year [date jdate?]) integer?]{
@@ -138,7 +140,7 @@ Return the day of the week, 0=Sunday, 6=Saturday.
 A @tt{dateset} is a wrapper around a strictly ascending immutable vector of @tt{jdate?}.
 Many operations require a dateset to traverse, such as @tt{ema}, @tt{sma}, and 
 @tt{dump}.  In general, the @tt{dateset} is optional and usually found through a
-paramter @tt{current_dates}.  Constructing a @tt{dateset} is best done via the
+parameter @tt{current_dates}.  Constructing a @tt{dateset} is best done via the
 @tt{dates} operation which flexibly intersects dates associated with series and
 other entities, including other @tt{dateset} instances.
 
@@ -148,10 +150,17 @@ a user will construct a dateset with the @tt{dates} operator.
 }
 
 @defparam[current-dates dateset dateset?]{
-The current-dates is used throughout the API, although most procedure permit overriding
+The current-dates is used throughout the API, although most procedures permit overriding
 it with a @tt{#dates} option.  As with any parameter, @tt{parameterize} can set a scoped
 binding, but an easier way is the @tt{with-dates} macro.
 }
+
+@racketblock[
+(with-dates SPY
+  (do-something)
+  (do-something-else))
+]
+
  
 @defproc[(dates [spec any] ... [#:first first jdate? MIN-DATE][#:last last jdate? MAX-DATE]
 [#:union union boolean? #t][#:expanded expanded boolean? #f]) dateset?]{
@@ -168,8 +177,8 @@ This example will find the intersection of SPY, DJIA and MSFT dates starting in 
 }
 
 @defstruct*[date-range([first optional-jdate?][last optional-jdate?])]{
-Handy specification for date bounds, either end of which can be #f.  A date-range is
-one of the available types to pass to @tt{dates}.
+@tt{date-range} is a handy specification for date bounds, either end of which can be #f.  It is 
+one of the available specification types to pass to @tt{dates}.
 }
  
 @defproc*[([(first-date) jdate?]
@@ -249,7 +258,10 @@ generates signals then the SPY ETF price series passes 1% above and 1% below
 its 200-period average.
 
 @racketblock[
-(cross #:slower (sma SPY 200) #:faster SPY #:upside-factor 1.01 #:downside-factor .99)
+(cross #:slower (sma SPY 200)
+       #:faster SPY
+       #:upside-factor 1.01
+       #:downside-factor .99)
 ]
                                          }
 
@@ -307,8 +319,8 @@ When a primary series does not cover dates sufficiently and a valid surrogate ex
 
 @section{Unsequenced Series}
 
-When a series can be generated without respect to a dateset, it is unsequenced. These include
-constant-value series, arithmetic on series, and/or logic, filters, mappings and calibration.
+When a series can be generated without referencing a dateset, it is unsequenced. These include
+constant-value series, arithmetic on series, and/or logic, filters, and mappings.
 
 @subsection{Arithmetic}
 
@@ -318,8 +330,8 @@ A series is created that always responds to a date query with the single @tt{val
 
 @defproc[(add [a series-or-real?][b series-or-real?]) series?]{
 Creates a series of the sum of @tt{a} and @tt{b} at each date for which both series
-generate values. If either @tt{a} or @tt{b} is a number, it is converted to a series
-first via @tt{constant}.  Thus, these two expressions are equivalent:
+generate values. If either @tt{a} or @tt{b} is a number, it is first converted to a series
+via @tt{constant}.  Thus, these two expressions are equivalent:
 @tt{(add some-series 1)} and @tt{(add some-series (constant 1))}
 }
 
@@ -384,8 +396,8 @@ is returned by @tt{b} is the response.
 @subsection{Functional}
 
 @defproc[(series-map [proc procedure?][input series?]...[#:missing-data-permitted missing-data-permitted boolean? #f]) series?]{
-The procedure @tt{proc} must handle arity that matches the number of input series, analogous
-to @tt{map} on lists.  Generally, the @tt{missing-data-permitted} option is false. If the
+The procedure @tt{proc} must handle arity that matches the number of input series, as
+@tt{map} does on lists.  Generally, the @tt{missing-data-permitted} option is false. If the
 given mapping procedure handles missing values, then missing-data-permitted should be set true.
 For instance to take the square root of a series:
 
@@ -396,7 +408,7 @@ For instance to take the square root of a series:
 
 @defproc[(series-filter [predicate procedure?][input series?]) series?]{
 Each value produced by the input series is passed to the output series unchanged if that value
-passes a predicate function.  For instance, @tt{(gt IBM 100)} is equivalent to
+passes the predicate.  For instance, @tt{(gt IBM 100)} is equivalent to
 @racketblock[
 (series-filter (curryr > 100) IBM)
 ]
@@ -443,7 +455,7 @@ if provided by @tt{equity-line}.
 }
 
 @defproc[(series-drawdown [input series?][#:dates dates dateset current-dates]) drawdown?]{
-   For a given series, return its drawdown, i.e. the max of observations representing the
+   For a given series, return its drawdown, i.e. the pair of observations representing the
    greatest loss in series value.
 }
 
