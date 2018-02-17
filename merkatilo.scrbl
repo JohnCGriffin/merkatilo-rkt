@@ -10,7 +10,7 @@
 
 @section{Background}
 
- After having creating a considerable amount of very fast, but complicated
+ After having created a considerable amount of fast, but complicated
  technical analysis tools in a hybrid of C++ and Python, I aimed for simplicity
  and minimalism.
  Thus, the merkatilo
@@ -32,7 +32,7 @@ is the argument to many functions that beget further
 @tt{series} instances.
 
 Series creations come in two styles, those requiring 
-a sequence of dates, a @tt{dateset}, and those that do not.  For example, the @tt{sma}
+a sequence of dates implemented as @tt{dateset}, and those that do not.  For example, the @tt{sma}
 procedure creates a new series representing a running average of the input series over a
 @tt{dateset}.  However, @tt{add} sums two input series on a date without reference to a
 date sequence.
