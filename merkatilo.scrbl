@@ -16,9 +16,13 @@
  Thus, the merkatilo
  libraries are
  my most-used subset of functionality in single language implementations.
- This is the Racket implementation. 
+ This is the Racket implementation.
 
-The code resides at @(hyperlink "https://github.com/JohnCGriffin/merkatilo-rkt" "Github") under MIT licensing.
+The purpose of this library is financial computing research and should not be used
+in connection with material funds at risk.
+
+The code resides at @(hyperlink "https://github.com/JohnCGriffin/merkatilo-rkt" "Github") under MIT licensing.  Corrections, improvements, or other comments are welcome.  Please include merkatilo
+in the subject line.
 
 John Griffin, griffinish at gmail
  
@@ -233,12 +237,12 @@ input makes @tt{ema} more useful than @tt{sma}.
 The default value for @tt{#:dates} is @tt{(current-dates)}.
 }
 
-@defproc[(sma [input-series series?] [Period integer?] [#:dates dates dateset? (current-dates)])
+@defproc[(sma [input-series series?] [period integer?] [#:dates dates dateset? (current-dates)])
 series?]{
-Each output value represents the average of the most current @tt{Period} values.  Until that
+Each output value represents the average of the most current @tt{period} values.  Until that
 number of values is met, there is no output.  Upon encountering a missing observation, the
 output average will be delayed again.  The maximum number of output values in the produced
-series is therefore (Period-1) less than the input.  This function matches what most people
+series is therefore (period-1) less than the input.  This function matches what most people
 expect of a moving average.  Otherwise, @tt{ema} is a generally better choice.
 
 The default value for @tt{#:dates} is @tt{(current-dates)}.
