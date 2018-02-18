@@ -206,7 +206,11 @@ outside the given dates will return #f.
 
 @section{Sequenced Series}
 
-Many series generating functions require traversal of a dateset.  These are sequenced series.
+A series that references a sequence of dates is sequenced.
+These include smoothing, signal generation, and time shifts. For each of these operations,
+the needed @tt{dateset}
+is supplied via the @tt{#:dates} parameter which defaults to the @tt{current-dates}
+parameter.
 
 @subsection{Series Smoothings}
 
@@ -388,7 +392,7 @@ analogous to @tt{gt} using > comparision
 }
 
 @defproc[(le [a series-or-real?][b series-or-real?]) series?]{
-analogous to @tt{le} using <= comparision
+analogous to @tt{gt} using <= comparision
 }
 
 @;------------------------------------------
