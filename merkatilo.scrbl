@@ -131,8 +131,6 @@ Return the day of month (1-31).
 Return the day of the week, 0=Sunday, 6=Saturday.
 }
 
-
-
 @;----------------------------------------
 
 @section{Date Sets}
@@ -191,6 +189,19 @@ First date of specified dates or first date of @tt{current-dates} parameter.
 Last date of specified dates or last date of @tt{current-dates} parameter.		    
 }
 
+@defproc[(nearest [dt jdate?][#:dates dates dateset? current-dates]) optional-jdate?]{
+Return the latest date in the @tt{dateset} that is not greater than the requested date. Requests
+outside the given dates will return #f.  
+}
+
+@defproc[(nearest+ [dt jdate?][#:dates dates dateset? current-dates]) optional-jdate?]{
+Return the earliest date in the @tt{dateset} that is not less than the requested date.  Requests
+outside the given dates will return #f.
+}
+          
+
+
+
 @;--------------------------------------
 
 @section{Sequenced Series}
@@ -233,13 +244,13 @@ The default value for @tt{#:dates} is @tt{(current-dates)}.
 @subsection{Signal Generation}
 
 Signal series are those that have non-repeating instances of buy and sell signals,
-respectively respresented as 1 and -1.  Building trading models with thise library,
+respectively respresented as 1 and -1.  Building trading models with this library,
 one strives to find signal generation that says something like "Buy low, sell high."
 By passing any manipulated series through @tt{to-signals}, any sequence of values will
 be translated into non-repeating -1 for negative values and 1 for non-negative values.
 
 A very common signal is a cross, generating a signal as one series moves above or below
-another.  The press often talks of a market index passing its 200-day moving average as
+another.  The market press often talks of a market index passing its 200-day moving average as
 an important event.  By the way, "200-day" in the press usually means 200 market days,
 not calendar days.
 
@@ -308,7 +319,11 @@ exemplified by a spider chart.
 }
 
 @defproc[(prepend [primary series?][#:with-surrogate surrogate series?][#:dates dates dateset current-dates]) series?]{
-When a primary series does not cover dates sufficiently and a valid surrogate exists, prepend joins the to, normalizing the values to the primary one at the point where they are siamesed.  For example, to do some sector analysis with First Trust sector ETFs, they might be prepended with iShares versions to approximate history for analysis preceding the First Trust inception.
+When a primary series has insufficient history for analytics and a reasonable surrogate
+exists, prepend joins them, normalizing the values to the primary one at the point
+where they are siamesed.  For example, to do some sector analysis with
+a First Trust sector ETF, one might prepend it with a similar iShares sector ETF 
+to approximate history for an analysis the precedes the First Trust inception.
 }
 
 @;-----------SEQUENCED ---------------
@@ -336,15 +351,15 @@ via @tt{constant}.  Thus, these two expressions are equivalent:
 }
 
 @defproc[(sub [a series-or-real?][b series-or-real?]) series?]{
-Analogous to @tt{add}.
+subtraction analogous to @tt{add}
 }
 
 @defproc[(mul [a series-or-real?][b series-or-real?]) series?]{
-Analogous to @tt{add}.
+multiplication analogous to @tt{add}
 }
 
 @defproc[(div [a series-or-real?][b series-or-real?]) series?]{
-Analogous to @tt{add}, but no value is generated when @tt{b} is zero.
+division analogous to @tt{add}, when @tt{b} is non-zero
 }
 
 @;-----------------------------
@@ -365,15 +380,15 @@ Analogous to @tt{add}, but no value is generated when @tt{b} is zero.
 }
 
 @defproc[(ge [a series-or-real?][b series-or-real?]) series?]{
-Analogous to @tt{gt} but uses >=.
+analogous to @tt{gt} using >= comparision
 }
 
 @defproc[(lt [a series-or-real?][b series-or-real?]) series?]{
-Analogous to @tt{gt} but uses <.
+analogous to @tt{gt} using > comparision
 }
 
-@defproc[(ge [a series-or-real?][b series-or-real?]) series?]{
-Analogous to @tt{le} but uses <=.
+@defproc[(le [a series-or-real?][b series-or-real?]) series?]{
+analogous to @tt{le} using <= comparision
 }
 
 @;------------------------------------------
@@ -477,8 +492,9 @@ if provided by @tt{equity-line}.
 }
 
 @defproc[(investment-performance [investment series?][#:alternate-investment alternate-investment series? constant][#:signals signals series? #f][#:dates dates dateset? current-dates]) performance?]{
-Return the performance structure of trading scheme (trading racket?) based upon signals or
-simply return the performance of buy/hold if no signals are supplied.
+Return the performance structure of trading based upon signals or
+simply return the performance of buy/hold if no signals are supplied.  Don't forgot
+to @tt{warp} the signals by one if you want realistic results to daily end-of-day signals.
 }
 
 @;--------- PERF MEASURES ---------------
