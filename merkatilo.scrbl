@@ -10,16 +10,12 @@
 
 @section{Background}
 
- After having created a considerable amount of fast, but complicated
- technical analysis tools in a hybrid of C++ and Python, I aimed for simplicity
- and minimalism.
- Thus, the merkatilo
- libraries are
- my most-used subset of functionality in single language implementations.
- This is the Racket implementation.
+The merkatilo time-series library implementations address my 
+personal financial computing research requirements.
+This is the Racket implementation.
 
-The purpose of this library is financial computing research and should not be used
-in connection with material funds at risk.
+The purpose of this library is financial computing research and education, not trading
+with material funds at risk.  Use it accordingly.
 
 The code resides at @(hyperlink "https://github.com/JohnCGriffin/merkatilo-rkt" "Github") under MIT licensing.  Corrections, improvements, or other comments are welcome.  Please include merkatilo
 in the subject line.
