@@ -330,6 +330,15 @@ a First Trust sector ETF, one might prepend it with a similar iShares sector ETF
 to approximate history for an analysis the precedes the First Trust inception.
 }
 
+@defproc[(window-series [input series?][n-periods integer?][proc procedure?][#:dates dates dateset current-dates][#:missing-data-permitted missing-data-permitted boolean? #f]) series?]{
+Collect sliding view of input values represented as a vector of length @tt{n-periods}.  The supplied procedure receives the
+vector and responds with a number.  For instance to find 22-day maxima:
+@racketblock[
+(window-series input-series 22 (λ (v) (apply max (vector->list v))))
+]
+Although flexible, window-series has quadratic big-O.  Treat it accordingly.
+}
+
 @;-----------SEQUENCED ---------------
 
 

@@ -54,13 +54,22 @@
            "sma.rkt"
            "private/test-support.rkt")
 
+  (define (vector-avg v)
+    (/ (for/sum ((n (in-vector v))) n)
+       (vector-length v)))
+
+  (check-not-exn
+   (λ ()
+     (with-dates (dates #:first '2013-1-1 #:last '2013-12-31)
+       (verify-equivalency
+        (sma TEST-SERIES 3)
+        (window-series TEST-SERIES 3 vector-avg)))))
+
   
   (check-not-exn
    (λ ()
      (with-dates TEST-SERIES
        (verify-equivalency
         (sma TEST-SERIES 200)
-        (window-series TEST-SERIES 200 (λ (v)
-                                        (/ (for/sum ((n (in-vector v))) n)
-                                           (vector-length v)))))))))
+        (window-series TEST-SERIES 200 vector-avg))))))
 
