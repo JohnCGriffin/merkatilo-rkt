@@ -4,7 +4,7 @@
 
 (provide
  (contract-out
-  [ window-series (->* (S integer? (-> vector? real?))
+  [ window-series (->* (S integer? (-> vector? integer? integer? real?))
                        (#:dates DS
                         #:missing-data-permitted boolean?)
                        S)]))
@@ -15,20 +15,20 @@
   
   (define window (make-vector N))
   (define-values (dv vv fd out-v) (common-setup s dates))
-  (define first-slot (sub1 N))
-  (for ((dt (in-vector dv (sub1 N)))
-        (start-slot (in-naturals))
-        (stop-slot (in-naturals N)))
-    
-    (define all
-      (for/fold ((good #t))
-                ((val (in-vector vv start-slot stop-slot))
-                 (ndx (in-naturals)))
-        (vector-set! window ndx val)
-        (and good val)))
-    
-    (when (or all missing-data-permitted)
-      (vector-set! out-v (- dt fd) (proc window))))
+
+  (for/fold ((count 0))
+            ((dt (in-vector dv))
+             (ndx (in-naturals))
+             (val (in-vector vv)))
+    (define new-count (if (or missing-data-permitted val) (add1 count) 0))
+    (when (>= new-count N)
+      (define start (add1 (- ndx N)))
+      (define stop (add1 ndx))
+      (vector-copy! window 0 vv start stop)
+      (define result (proc window))
+      (when result
+        (vector-set! out-v (- dt fd) result)))
+    new-count)
   
   (make-vector-series
    #:first-date fd
