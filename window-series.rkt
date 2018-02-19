@@ -4,7 +4,7 @@
 
 (provide
  (contract-out
-  [ window-series (->* (S integer? (-> vector? integer? integer? real?))
+  [ window-series (->* (S integer? (-> vector? real?))
                        (#:dates DS
                         #:missing-data-permitted boolean?)
                        S)]))
