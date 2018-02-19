@@ -18,16 +18,17 @@
 
   (for/fold ((count 0))
             ((dt (in-vector dv))
-             (ndx (in-naturals))
+             (stop (in-naturals 1))
              (val (in-vector vv)))
-    (define new-count (if (or missing-data-permitted val) (add1 count) 0))
+    
+    (define ok (or val missing-data-permitted val))
+    (define new-count (if ok (add1 count) 0))
+    
     (when (>= new-count N)
-      (define start (add1 (- ndx N)))
-      (define stop (add1 ndx))
-      (vector-copy! window 0 vv start stop)
-      (define result (proc window))
-      (when result
-        (vector-set! out-v (- dt fd) result)))
+      (vector-copy! window 0 vv (- stop N) stop)
+      (vector-set! out-v
+                   (- dt fd)
+                   (proc window)))
     new-count)
   
   (make-vector-series
