@@ -57,8 +57,9 @@
 
 ;====================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "series-binop.rkt"
            "constant.rkt"
            "private/test-support.rkt")

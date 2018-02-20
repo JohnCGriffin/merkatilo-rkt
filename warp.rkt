@@ -45,16 +45,17 @@
 
 ;===============================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
-           "series-count.rkt"
+           (submod "..")
            "private/test-support.rkt")
+
   (with-dates TEST-SERIES
-    
+
     (define wa1 (warp TEST-SERIES 1))
     (define back-again (warp wa1 -1))
     ;(dump TEST-SERIES wa1 back-again)
-    
+
     (check-equal?
      (add1 (series-count back-again))
      (series-count TEST-SERIES))

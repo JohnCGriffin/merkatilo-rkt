@@ -49,10 +49,9 @@
 
 ;=====================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
-           "series-count.rkt"
-           "core/jdate.rkt"
+           (submod "..")
            "first-last-ob.rkt"
            "private/test-support.rkt")
   

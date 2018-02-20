@@ -19,6 +19,18 @@
          dump
          NEVER-SERIES)
 
+; reexport some handies
+(provide with-dates
+         first-date
+         last-date
+         dates
+         current-dates
+         ->jdate
+         series-count
+         ob-d ob-v
+         dateset-vector
+         (struct-out series))
+
 (require racket/list
          racket/file
          racket/string
@@ -28,6 +40,7 @@
          "../core/series.rkt"
          "../core/dates.rkt"
          "../obs-series.rkt"
+         "../series-count.rkt"
          "../dump.rkt")
 
 (define (approx num)

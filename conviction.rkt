@@ -62,11 +62,11 @@
 
 ;===============================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "private/test-support.rkt"
            "signals.rkt"
-           "series-count.rkt"
            "momentum.rkt")
            
   (define signals
@@ -80,11 +80,6 @@
        (verify-equivalency
         (conviction (mo TEST-SERIES 5) 4)
         MO-5-CONVICTION-4-SERIES)))
-
-    ; conviction of ZERO disallowed by contract, but for testing
-    ; is an identity of the input signals.
-    (check-equal? (series-count (conviction signals 0))
-                  (series-count signals))
 
     (check-equal? (series-count signals) 147)
     
