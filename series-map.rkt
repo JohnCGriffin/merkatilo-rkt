@@ -79,8 +79,9 @@
 
 ;============================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            (only-in racket/function identity)
            "constant.rkt"
            "private/test-support.rkt")

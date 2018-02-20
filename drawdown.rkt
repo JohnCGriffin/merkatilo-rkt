@@ -88,8 +88,9 @@
 
 
 ;=============================================
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "private/test-support.rkt")
 
   (check-equal?

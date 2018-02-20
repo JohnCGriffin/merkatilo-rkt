@@ -65,9 +65,11 @@
 
 ;===========================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "series-count.rkt"
+           "series-map.rkt"
            "private/test-support.rkt")
 
   (with-dates TEST-SERIES

@@ -66,8 +66,9 @@
 
 ;======================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "core/series.rkt"
            "core/dates.rkt")
   (define never-series

@@ -47,10 +47,11 @@
 
 ;=================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
            racket/vector
            racket/string
+           (submod "..")
            "obs-series.rkt"
            "private/test-support.rkt"
            "momentum.rkt")

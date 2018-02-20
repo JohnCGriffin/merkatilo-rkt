@@ -49,8 +49,9 @@
 
 ;==================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "sma.rkt"
            "private/test-support.rkt")
 

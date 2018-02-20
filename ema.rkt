@@ -70,20 +70,14 @@
 
 ;==================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
            racket/vector
+           (submod "..")
            "series-binop.rkt"
            "warp.rkt"
            "private/series-dates-values.rkt"
            "private/test-support.rkt")
-
-  (check-not-exn
-   (λ ()
-     (with-dates TEST-SERIES
-       (verify-equivalency
-        (ema TEST-SERIES 3)
-        (fractional TEST-SERIES 1/2)))))
 
   (check-not-exn
    (λ ()

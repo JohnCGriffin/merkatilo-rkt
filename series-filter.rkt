@@ -18,8 +18,9 @@
 
 ;============================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            (only-in racket/function curryr)
 	   "series-count.rkt"
            "private/test-support.rkt")

@@ -78,8 +78,9 @@
 
 
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "ema.rkt"
            "private/test-support.rkt")
 

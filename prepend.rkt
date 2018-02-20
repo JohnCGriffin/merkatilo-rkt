@@ -52,8 +52,9 @@
 
 ;===========================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "private/test-support.rkt")
   (with-dates (dates #:first '2012-1-1 #:last '2015-1-1)
     (define EARLIER (literal-series '((2013-1-1 80) (2013-2-1 90) (2013-3-1 100))))

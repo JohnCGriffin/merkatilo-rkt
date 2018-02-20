@@ -23,12 +23,15 @@
 (provide with-dates
          first-date
          last-date
+         today
          dates
          current-dates
          ->jdate
+         jdate->text
          series-count
          ob-d ob-v
          dateset-vector
+         (struct-out date-range)
          (struct-out series))
 
 (require racket/list

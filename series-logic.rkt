@@ -25,8 +25,9 @@
 
 
 ;====================================
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "private/test-support.rkt")
   (define A (literal-series '((2012-2-1 1)
                               (2012-3-3 1)

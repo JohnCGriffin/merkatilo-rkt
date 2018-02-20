@@ -51,10 +51,12 @@
 
 ;============================================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "series-binop.rkt"
            "warp.rkt"
+           "core/series.rkt"
            "private/test-support.rkt")
 
   (check-equal?

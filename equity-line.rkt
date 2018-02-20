@@ -85,8 +85,9 @@
 
 ;============================================
 
-(module+ test
+(module* test racket/base
   (require rackunit
+           (submod "..")
            "cross.rkt"
            "ema.rkt"
            "private/test-support.rkt")
