@@ -14,8 +14,10 @@
 ;; observations as the source series.
 
 
-(require "private/common-requirements.rkt"
-         (only-in "private/contracts.rkt" periodic/c))
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  (only-in "private/contracts.rkt" periodic/c)))
 
 (provide
  (contract-out
@@ -29,8 +31,8 @@
   (define prev-fraction (- 1.0 fraction))
 
   (for/fold ((prev #f))
-      ((dt (in-vector dv))
-       (val (in-vector vv)))
+            ((dt (in-vector dv))
+             (val (in-vector vv)))
     (let ((next (if (and val prev)
                     (+ (* fraction val)
                        (* prev-fraction prev))
@@ -100,7 +102,7 @@
        (check-equal? final-value (ema3f (last-date)))))))
 
 
-                 
 
-       
+
+
 

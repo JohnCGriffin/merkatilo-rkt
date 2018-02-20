@@ -1,8 +1,10 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt"
-         "momentum.rkt"
-         "private/utilities.rkt")
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  "momentum.rkt"
+  "private/utilities.rkt"))
 
 (provide
  (contract-out
@@ -44,6 +46,6 @@
     (check-equal?
      (volatility TEST-SERIES #:days 200)
      0.0468086666214253)))
-  
+
 
 

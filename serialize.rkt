@@ -1,14 +1,16 @@
 #lang racket/base
 
 
-(require (only-in racket/port port->lines)
-         (only-in racket/string string-split)
-         (only-in racket/list filter-map first second)
-         (only-in racket/contract contract-out ->)
-         "core/dates.rkt"
-         "core/jdate.rkt"
-         "core/series.rkt"
-         "obs-series.rkt")
+(require
+ (combine-in
+  (only-in racket/port port->lines)
+  (only-in racket/string string-split)
+  (only-in racket/list filter-map first second)
+  (only-in racket/contract contract-out ->)
+  "core/dates.rkt"
+  "core/jdate.rkt"
+  "core/series.rkt"
+  "obs-series.rkt"))
 
 (provide
  (contract-out

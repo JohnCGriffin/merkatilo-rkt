@@ -8,10 +8,12 @@
 ;; access and decoding outside this library's scope.
 
 
-(require (only-in racket/contract contract-out -> case->)
-         "private/contracts.rkt"
-         "core/series.rkt"
-         "private/default-loader.rkt")
+(require
+ (combine-in
+  (only-in racket/contract contract-out -> case->)
+  "private/contracts.rkt"
+  "core/series.rkt"
+  "private/default-loader.rkt"))
 
 (provide
  (contract-out

@@ -1,8 +1,10 @@
 #lang racket/base
 
-(require (only-in racket/contract contract-out -> any/c)
-         "core/series.rkt"
-	 "private/vector-series.rkt")
+(require
+ (combine-in
+  (only-in racket/contract contract-out -> any/c)
+  "core/series.rkt"
+  "private/vector-series.rkt"))
 
 (provide
  (contract-out

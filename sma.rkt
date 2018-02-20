@@ -1,7 +1,9 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt"
-         (only-in "private/contracts.rkt" periodic/c))
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  (only-in "private/contracts.rkt" periodic/c)))
 
 (provide (contract-out [ sma periodic/c ]))
 
@@ -68,4 +70,4 @@
      (ob-v (last-ob (sma TEST-SERIES 3)))
      (/ (+ 340 337 337) 3.0))))
 
-  
+

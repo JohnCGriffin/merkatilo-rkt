@@ -1,10 +1,12 @@
 #lang racket/base
 
 
-(require "private/common-requirements.rkt"
-	 (only-in "private/contracts.rkt" periodic/c)
-         "fudge.rkt"
-         "repeated.rkt")
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  (only-in "private/contracts.rkt" periodic/c)
+  "fudge.rkt"
+  "repeated.rkt"))
 
 
 (provide

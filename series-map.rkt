@@ -1,8 +1,10 @@
 #lang racket/base
 
 
-(require (only-in racket/match match)
-         "private/common-requirements.rkt")
+(require
+ (combine-in
+  (only-in racket/match match)
+  "private/common-requirements.rkt"))
 
 (provide
  (contract-out

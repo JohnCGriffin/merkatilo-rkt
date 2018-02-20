@@ -1,11 +1,13 @@
 #lang racket/base
 
-(require (only-in racket/contract contract-out -> ->*)
-         (only-in "private/contracts.rkt" observation-list/c S DS)
-         "private/series-dates-values.rkt"
-         "core/series.rkt"
-	 "private/vector-series.rkt"
-         "core/dates.rkt")
+(require
+ (combine-in
+  (only-in racket/contract contract-out -> ->*)
+  (only-in "private/contracts.rkt" observation-list/c S DS)
+  "private/series-dates-values.rkt"
+  "core/series.rkt"
+  "private/vector-series.rkt"
+  "core/dates.rkt"))
 
 (provide
  (contract-out
@@ -18,8 +20,8 @@
   (define vv (series-dates-values s dv))
   (define result
     (for/list ((dt dv)
-             (val vv)
-             #:when val)
+               (val vv)
+               #:when val)
       (observation dt val)))
   (if (pair? result)
       result
@@ -58,5 +60,5 @@
          #:first-date first-date))
       
       (series (λ (dt) #f) name)))
-  
+
 

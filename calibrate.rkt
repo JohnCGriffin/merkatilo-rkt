@@ -8,8 +8,10 @@
 ;; value of the series there is 100, making any value in the series
 ;; equivalent to the percentage of the beginning.
 
-(require "private/common-requirements.rkt"
-	 "private/contracts.rkt")
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  "private/contracts.rkt"))
 
 (provide
  (contract-out
@@ -27,9 +29,9 @@
     (let* ((dt (->jdate date))
 	   (val (sf dt))
 	   (problem (cond
-		     ((not val) "no observation at ~a")
-		     ((zero? val) "value is ZERO at ~a")
-		     (else #f))))
+                      ((not val) "no observation at ~a")
+                      ((zero? val) "value is ZERO at ~a")
+                      (else #f))))
       (if problem
 	  (raise-user-error 'calibrate problem (jdate->text dt))
 	  (/ init val))))

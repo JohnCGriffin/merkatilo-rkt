@@ -1,7 +1,9 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt"
-         "first-last-ob.rkt")
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  "first-last-ob.rkt"))
 
 (provide
  (contract-out

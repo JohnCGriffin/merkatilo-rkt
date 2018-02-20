@@ -1,9 +1,11 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt"
-         "series-map.rkt"
-         "constant.rkt"
-         (only-in "private/contracts.rkt" binop/c))
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  "series-map.rkt"
+  "constant.rkt"
+  (only-in "private/contracts.rkt" binop/c)))
 
 
 (provide
@@ -91,23 +93,23 @@
     (check-not-exn
      (λ ()
        (with-dates TEST-SERIES
-       (verify-equivalency
-        (mul 3 TEST-SERIES)
-        (series-map + TEST-SERIES TEST-SERIES TEST-SERIES)))))
+         (verify-equivalency
+          (mul 3 TEST-SERIES)
+          (series-map + TEST-SERIES TEST-SERIES TEST-SERIES)))))
 
     (check-not-exn
      (λ ()
        (with-dates TEST-SERIES
-       (verify-equivalency
-        (div (add TEST-SERIES TEST-SERIES) 2)
-        TEST-SERIES))))
+         (verify-equivalency
+          (div (add TEST-SERIES TEST-SERIES) 2)
+          TEST-SERIES))))
 
     (check-not-exn
      (λ ()
        (with-dates TEST-SERIES
-       (verify-equivalency
-        (mul 2 TEST-SERIES)
-        (add TEST-SERIES TEST-SERIES)))))))
+         (verify-equivalency
+          (mul 2 TEST-SERIES)
+          (add TEST-SERIES TEST-SERIES)))))))
 
 
 

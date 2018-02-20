@@ -21,12 +21,14 @@
 ;; in-vector within the library.
 
 
-(require (only-in racket/function curry identity)
-         (only-in racket/set set? set-member? for/set set->list)
-         (only-in racket/contract -> ->* contract-out listof case-> or/c flat-named-contract)
-         "jdate.rkt"
-         "series.rkt"
-         "../private/binary-search.rkt")
+(require
+ (combine-in
+  (only-in racket/function curry identity)
+  (only-in racket/set set? set-member? for/set set->list)
+  (only-in racket/contract -> ->* contract-out listof case-> or/c flat-named-contract)
+  "jdate.rkt"
+  "series.rkt"
+  "../private/binary-search.rkt"))
 
 
 (define dates-convertible/c

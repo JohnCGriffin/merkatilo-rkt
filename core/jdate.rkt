@@ -7,8 +7,10 @@
 ;; with PostgreSQL.
 
 
-(require (only-in racket/contract contract-out -> ->* any/c or/c and/c between/c)
-         "../private/memoize.rkt")
+(require
+ (combine-in
+  (only-in racket/contract contract-out -> ->* any/c or/c and/c between/c)
+  "../private/memoize.rkt"))
 
 (provide
  (except-out (struct-out ymd) ymd)

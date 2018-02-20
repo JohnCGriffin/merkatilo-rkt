@@ -1,7 +1,9 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt"
-         "private/utilities.rkt")
+(require
+ (combine-in
+  "private/common-requirements.rkt"
+  "private/utilities.rkt"))
 
 (provide
  (contract-out

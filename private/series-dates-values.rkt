@@ -2,10 +2,12 @@
 
 (provide series-dates-values)
 
-(require (only-in racket/vector vector-map)
-         racket/unsafe/ops
-         "../core/series.rkt"
-	 "vector-series.rkt")
+(require
+ (combine-in
+  (only-in racket/vector vector-map)
+  racket/unsafe/ops
+  "../core/series.rkt"
+  "vector-series.rkt"))
 
 (define (series-dates-values s dv)
   (vector->immutable-vector
