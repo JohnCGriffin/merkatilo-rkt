@@ -10,7 +10,7 @@ rkt-doc.tar: documentation
 	(cd doc && tar cf ../rkt-doc.tar .)
 
 clean:
-	@rm -rf `find . -type d -name compiled` doc rkt-doc.tar
+	@rm -rf `find . -type d -name compiled` doc rkt-doc.tar coverage
 
 /tmp/merkatilo-test-data/ema-3.txt:
 	@rm -rf /tmp/merkatilo-test-data && (cd /tmp && git clone https://github.com/JohnCGriffin/merkatilo-test-data)

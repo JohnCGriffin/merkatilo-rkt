@@ -63,4 +63,25 @@
 
   (check-equal?
    (->jdate "2012-01-13")
-   (observation-date (min-ob TEST-SERIES #:dates (dates TEST-SERIES)))))
+   (observation-date (min-ob TEST-SERIES #:dates (dates TEST-SERIES))))
+
+  (check-exn
+   exn?
+   (λ ()
+     (min-ob TEST-SERIES #:dates (dates (date-range '1996-1-1 '1997-1-1)))))
+
+  (with-dates TEST-SERIES
+
+    (define-values (mn mx) (min-max-obs TEST-SERIES))
+
+    (check-equal? mx (max-ob TEST-SERIES))
+
+    (check-equal? mn (min-ob TEST-SERIES))
+    
+    (check-equal?
+     (->jdate "2014-09-18")
+     (observation-date (max-ob TEST-SERIES)))
+
+    (check-equal?
+     (->jdate "2012-01-13")
+     (observation-date (min-ob TEST-SERIES)))))

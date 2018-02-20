@@ -5,7 +5,7 @@
 ;; is handy but lower performance than using the more verbose
 ;; (in-vector (dateset-vector ...)) call.
 
-(require (only-in racket/contract contract-out -> or/c)
+(require (only-in racket/contract contract-out -> or/c ->*)
 	 (only-in "private/contracts.rkt" series-name/c S)
          "core/series.rkt"
          "load.rkt"
@@ -13,31 +13,20 @@
          "core/dates.rkt")
 
 (provide
- in-dates
  lo-set-dates
  (contract-out
+  [ in-dates (->* () (dateset?) sequence?) ]
   [ lo-or-not (-> series-name/c (or/c #f S)) ]
   [ lo-prepended (-> series-name/c #:with-surrogate-id series-name/c S) ]))
 
-(define-syntax lo-set-dates
-  (syntax-rules ()
-   [ (lo-set-dates NAME)
-     (let ((tmp (lo NAME)))
-       (current-dates (->dateset tmp))
-       tmp)]
-   [ (lo-set-dates NAME arg ...)
-     (let* ((tmp (lo NAME))
-	    (dts (dates arg ...)))
-       (current-dates dts)
-       tmp) ]))
 
+(define (lo-set-dates id)
+  (define loaded (lo id))
+  (current-dates (dates loaded))
+  loaded)
 
-(define-syntax in-dates
-  (syntax-rules ()
-    [ (in-dates DTS)
-      (in-vector (dateset-vector DTS)) ]
-    [ (in-dates)
-      (in-vector (dateset-vector (current-dates))) ]))
+(define (in-dates (dates (current-dates)))
+  (in-vector (dateset-vector dates)))
 
 (define (lo-prepended id #:with-surrogate-id with-surrogate-id)
   (define primary (lo id))
@@ -50,3 +39,26 @@
     (lo id)))
 
 
+
+;===============================================
+
+(module+ test
+  (require rackunit
+           "private/test-support.rkt")
+
+  (check-not-exn
+   (λ ()
+     (lo-or-not 'UNAVAILABLE)))
+
+  (check-not-exn
+   (λ ()
+     (lo-or-not 'UNAVAILABLE::VOLUME)))
+
+  (with-dates TEST-SERIES
+    (check-equal?
+     (for/sum ((i (in-dates))) 1)
+     754))
+
+  (check-equal?
+   (for/sum ((i (in-dates (dates TEST-SERIES)))) 1)
+   754))

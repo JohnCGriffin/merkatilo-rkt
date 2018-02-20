@@ -70,9 +70,7 @@
            (let* ((filled (repeated signals #:repeat-last #t))
                   (longs (series-count (gt filled 0)))
                   (total (series-count filled)))
-             (if (zero? total)
-                 0
-                 (/ longs total)))))
+             (/ longs total))))
     
     (performance vol-res
                  dd-res
@@ -85,8 +83,7 @@
 
 
 
-
-;========= regression checks ============
+;===============================
 
 (module+ test
   
@@ -101,6 +98,18 @@
   (define nostradamus-performance
     (with-dates TEST-SERIES
       (investment-performance TEST-SERIES #:signals nostradamus-signals)))
+
+  (define nostradamus-text (performance->text nostradamus-performance))
+
+  (with-dates TEST-SERIES
+    
+    (check-equal?
+     (approx (gpa TEST-SERIES))
+     (approx 0.07688365986138823))
+     
+    (check-not-exn
+     (λ ()
+       (investment-performance TEST-SERIES))))
 
   (check-equal?
    (approx (gpa TEST-SERIES #:dates (dates TEST-SERIES)))

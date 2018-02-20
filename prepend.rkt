@@ -46,19 +46,28 @@
   (define LATER (literal-series '((2013-3-1 1000) (2013-6-1 1130))))
   (with-dates (dates #:first '2013-1-1 #:last '2015-1-1)
     (dump EARLIER LATER (prepend LATER #:with-surrogate EARLIER))))
-      
+
+
 
 
 ;===========================================
 
 (module+ test
-    (require rackunit
-             "private/test-support.rkt")
+  (require rackunit
+           "private/test-support.rkt")
   (with-dates (dates #:first '2012-1-1 #:last '2015-1-1)
     (define EARLIER (literal-series '((2013-1-1 80) (2013-2-1 90) (2013-3-1 100))))
     (define LATER (literal-series '((2013-3-1 1000) (2013-6-1 1130))))
-    (verify-equivalency
+    (define TOO-MUCH-LATER (literal-series '((2014-1-1 10000) (2016-1-1 11111))))
+    (check-exn
+     exn?
+     (λ ()
+       (with-dates (dates #:first '2000-1-1 #:last (today))
+         (prepend TOO-MUCH-LATER #:with-surrogate EARLIER))))
+    (check-not-exn
+     (λ ()
+       (verify-equivalency
         (prepend LATER #:with-surrogate EARLIER)
-        (literal-series '((2013-1-1 800) (2013-2-1 900) (2013-3-1 1000) (2013-6-1 1130))))))
+        (literal-series '((2013-1-1 800) (2013-2-1 900) (2013-3-1 1000) (2013-6-1 1130))))))))
 
 

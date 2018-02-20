@@ -16,7 +16,8 @@
          verify-equivalency
          literal-series
          approx
-         dump)
+         dump
+         NEVER-SERIES)
 
 (require racket/list
          racket/file
@@ -109,6 +110,9 @@
 
 (define RECENT-DATES
   (dates FULL-DATES #:first '2014-12-10 #:expanded #t))
+
+(define NEVER-SERIES
+  (series (λ (dt) #f) "never more"))
 
 (define (verify-equivalency a b)
   (define af (series-function a))

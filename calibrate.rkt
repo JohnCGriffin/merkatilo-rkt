@@ -36,10 +36,6 @@
 	  (raise-user-error 'calibrate problem (jdate->text dt))
 	  (/ init val))))
   
-  (define (f dt)
-    (define val (sf dt))
-    (and val (* ratio val)))
-
   (series
    (lambda (dt)
      (define val (sf dt))
@@ -64,7 +60,21 @@
 (module+ test
   (require rackunit
            "series-binop.rkt"
+           "constant.rkt"
            "private/test-support.rkt")
+
+  (check-exn
+   exn?
+   (λ ()
+     (with-dates TEST-SERIES
+       (calibrate NEVER-SERIES))))
+
+  (check-exn
+   exn?
+   (λ ()
+     (with-dates TEST-SERIES 
+       (calibrate (constant 0)))))
+
 
   (check-not-exn
    (λ ()

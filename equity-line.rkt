@@ -38,19 +38,19 @@
 	     (buy? #t)
 	     (prev-inv #f)
 	     (prev-alt #f))
-      ((dt (in-vector dv))
-       (alt (in-vector alt-v))
-       (inv (in-vector inv-v))
-       (sig (in-vector sig-v))
-       #:when (or (and inv alt) sig))
+            ((dt (in-vector dv))
+             (alt (in-vector alt-v))
+             (inv (in-vector inv-v))
+             (sig (in-vector sig-v))
+             #:when (or (and inv alt) sig))
     
     (define change
       (cond
-       ((not inv) (oops "missing investment observation at ~a" dt))
-       ((not alt) (oops "missing alternative investment observation at ~a" dt))
-       ((<= dt first-sig-date) 1.0)
-       (buy? (if prev-inv (/ inv prev-inv) 1.0))
-       (else (if prev-alt (/ alt prev-alt) 1.0))))
+        ((not inv) (oops "missing investment observation at ~a" dt))
+        ((not alt) (oops "missing alternative investment observation at ~a" dt))
+        ((<= dt first-sig-date) 1.0)
+        (buy? (if prev-inv (/ inv prev-inv) 1.0))
+        (else (if prev-alt (/ alt prev-alt) 1.0))))
 
     (let ((new-buy? (if sig (> sig 0) buy?))
 	  (new-product (* product change)))
@@ -92,12 +92,21 @@
            "private/test-support.rkt")
 
   (with-dates TEST-SERIES
-    
+
+    (define ALT (series (λ (dt) (* 1.0 dt)) "reflector"))
+
     (define crossed
       (cross #:slower (ema TEST-SERIES 10) #:faster TEST-SERIES))
 
-    (verify-equivalency
-     (equity-line TEST-SERIES crossed)
-     EQUITYLINE-EMA-10)))
+    ; Just to exercise code path
+    (check-not-exn
+     (λ ()
+       (equity-line TEST-SERIES crossed #:alternate-investment ALT)))
 
-  
+    (check-not-exn
+     (λ ()
+       (verify-equivalency
+        (equity-line TEST-SERIES crossed)
+        EQUITYLINE-EMA-10)))))
+
+

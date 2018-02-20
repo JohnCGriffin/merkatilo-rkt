@@ -12,8 +12,7 @@
 (provide
  (contract-out
   [ mo-days periodic/c ]
-  [ mo periodic/c ] 
-  [ mo% periodic/c ]))
+  [ mo periodic/c ]))
 
 
 (define (change val old-val)
@@ -52,20 +51,6 @@
    #:vector vec
    #:first-date fd))
 
-(define (mo% s N #:dates (dts (current-dates)))
-  
-  (define-values (vec fd)
-    (mo-worker s N dts))
-  
-  (for ((ndx (in-range (vector-length vec))))
-    (define val (vector-ref vec ndx))
-    (and val (vector-set! vec ndx (* 100.0 val))))
-  
-  (make-vector-series
-   #:name (format "(mo% ~a ~a)" (abbreviate s) N)
-   #:vector vec
-   #:first-date fd))
-
 (define (mo-days s days #:dates (dts (current-dates)))
   (define-values (dv vv fd out-v) (common-setup s dts))
   (define ff (series-function (fudge s)))
@@ -93,7 +78,6 @@
   (typical-run (λ () TEST-SERIES)
                (λ () (constant 1))
                (λ () (mo TEST-SERIES 5))
-               (λ () (mo% TEST-SERIES 5))
                (λ () (mo-days TEST-SERIES 5))))
 
 

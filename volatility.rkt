@@ -43,9 +43,18 @@
            "private/test-support.rkt")
 
   (with-dates TEST-SERIES
+    
     (check-equal?
-     (volatility TEST-SERIES #:days 200)
-     0.0468086666214253)))
+     (approx (volatility TEST-SERIES))
+     (approx 0.038702419488645126))
+    
+    (check-equal?
+     (approx (volatility-residual TEST-SERIES))
+     (approx 0.9612975805113548))
+    
+    (check-equal?
+     (approx (volatility TEST-SERIES #:days 200))
+     (approx 0.0468086666214253))))
 
 
 

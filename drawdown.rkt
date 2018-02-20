@@ -91,6 +91,11 @@
 (module+ test
   (require rackunit
            "private/test-support.rkt")
+
+  (check-equal?
+     (drawdown-residual TEST-SERIES #:dates (dates TEST-SERIES))
+     (with-dates TEST-SERIES (drawdown-residual TEST-SERIES)))
+  
   (with-dates TEST-SERIES
     (define result (series-drawdown TEST-SERIES))
     (define sf (series-function TEST-SERIES))

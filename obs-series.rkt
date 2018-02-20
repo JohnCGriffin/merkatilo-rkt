@@ -62,3 +62,25 @@
       (series (λ (dt) #f) name)))
 
 
+
+
+;======================================
+
+(module+ test
+  (require rackunit
+           "core/series.rkt"
+           "core/dates.rkt")
+  (define never-series
+    (series (λ (dt) #f) "never.."))
+
+  (with-dates (dates (date-range '2000-1-1 '2001-1-1))
+
+    (check-exn
+     exn?
+     (λ ()
+       (series->obs (current-dates) never-series)))
+
+    (check-not-exn
+     (λ ()
+       (obs->series '())))))
+

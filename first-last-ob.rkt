@@ -36,6 +36,27 @@
            "private/series-dates-values.rkt"
            "private/test-support.rkt")
 
+
+  (with-dates TEST-SERIES
+
+    (check-exn
+     exn?
+     (λ ()
+       (last-ob NEVER-SERIES)))
+    
+    (check-exn
+     exn?
+     (λ ()
+       (first-ob NEVER-SERIES)))
+    
+    (check-equal?
+     (ob-d (first-ob TEST-SERIES))
+     (->jdate '2012-01-03))
+
+    (check-equal?
+     (ob-d (last-ob TEST-SERIES))
+     (->jdate '2014-12-31)))
+
   (check-equal?
    (ob-d (first-ob TEST-SERIES #:dates (dates TEST-SERIES)))
    (->jdate '2012-01-03))

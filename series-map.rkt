@@ -81,6 +81,7 @@
 
 (module+ test
   (require rackunit
+           (only-in racket/function identity)
            "constant.rkt"
            "private/test-support.rkt")
 
@@ -102,6 +103,12 @@
   (check-equal?
    (count-missing-values #f)
    0)
+
+  (check-exn
+   exn?
+   (λ ()
+     (with-dates TEST-SERIES
+       (series-map identity TEST-SERIES TEST-SERIES))))
 
   (check-not-exn
    (λ ()
