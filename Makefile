@@ -21,3 +21,5 @@ merkatilo-test-data: /tmp/merkatilo-test-data/ema-3.txt
 test: merkatilo
 	@raco test -x . 
 
+version:
+	@git describe --abbrev=0
