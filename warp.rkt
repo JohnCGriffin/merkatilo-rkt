@@ -4,7 +4,12 @@
 ;; when N is negative).  A typical use would be to warp signal data for
 ;; calculating trades on the next market day.
 
-(require "private/common-requirements.rkt")
+(require "private/common-requirements.rkt"
+         (rename-in racket/unsafe/ops
+                    [ unsafe-fx+ fx+ ]
+                    [ unsafe-fx- fx- ]
+                     [ unsafe-fx< fx< ]
+                     [ unsafe-fx<= fx<= ]))
 
 (provide (contract-out [ warp (->* (S integer?) (#:dates DS) S) ]))
 
@@ -17,12 +22,14 @@
   (for ((val (in-vector vv))
         (ndx (in-naturals))
         #:when val)
-    (define warp-ndx (+ ndx N))
-    (define target-date (and (< -1 warp-ndx dv-len)
+    (define warp-ndx (fx+ ndx N))
+    (define target-date (and (fx< -1 warp-ndx)
+                             (fx< warp-ndx dv-len)
                              (vector-ref dv warp-ndx)))
     (define target-slot (and target-date
-                             (<= fd target-date ld)
-                             (- target-date fd)))
+                             (fx<= fd target-date)
+                             (fx<= target-date ld)
+                             (fx- target-date fd)))
     (when target-slot
       (vector-set! out-v target-slot val)))
 
@@ -38,7 +45,7 @@
 
 (module+ main
   (require "private/test-support.rkt")
-  (typical-run
+  (typical-run #:iterations 1000
    (λ () TEST-SERIES)
    (λ () (warp TEST-SERIES 2))))
 

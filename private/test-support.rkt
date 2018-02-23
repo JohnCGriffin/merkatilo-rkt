@@ -57,7 +57,9 @@
                       (define val (cadr p))
                       (observation dt val)) date-vals)))
 
-(define (typical-run  #:full-dump (full-dump #f) . thunks)
+(define (typical-run #:iterations (iterations 1000)
+                     #:full-dump (full-dump #f)
+                     . thunks)
   
   (define result
     (with-dates FULL-DATES
@@ -83,9 +85,9 @@
     (define dv (dateset-vector (current-dates)))
     (collect-garbage)
     (collect-garbage)
-    (printf "\n1000 iterations: ")
+    (printf "\n~a iterations: " iterations)
     (time
-     (for ((i (in-range 1000)))
+     (for ((i (in-range iterations)))
        (series-dates-values (F) dv)))))
 
 

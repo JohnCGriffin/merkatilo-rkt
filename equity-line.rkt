@@ -8,7 +8,10 @@
 
 
 (require "private/common-requirements.rkt"
-	 "first-last-ob.rkt")
+	 "first-last-ob.rkt"
+         (rename-in racket/unsafe/ops
+                    [ unsafe-fx<= fx<= ]
+                    [ unsafe-fx- fx- ]))
 
 (provide
  (contract-out
@@ -48,13 +51,13 @@
       (cond
         ((not inv) (oops "missing investment observation at ~a" dt))
         ((not alt) (oops "missing alternative investment observation at ~a" dt))
-        ((<= dt first-sig-date) 1.0)
+        ((fx<= dt first-sig-date) 1.0)
         (buy? (if prev-inv (/ inv prev-inv) 1.0))
         (else (if prev-alt (/ alt prev-alt) 1.0))))
 
     (let ((new-buy? (if sig (> sig 0) buy?))
 	  (new-product (* product change)))
-      (vector-set! out-v (- dt fd) (* new-product init-value))
+      (vector-set! out-v (fx- dt fd) (* new-product init-value))
       (values new-product new-buy? inv alt)))
   
 

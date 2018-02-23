@@ -17,7 +17,12 @@
 (require
  (combine-in
   "private/common-requirements.rkt"
-  (only-in "private/contracts.rkt" periodic/c)))
+  (only-in "private/contracts.rkt" periodic/c))
+ (rename-in racket/unsafe/ops
+            [ unsafe-fl* fl* ]
+            [ unsafe-fl+ fl+ ]
+            [ unsafe-fx- fx- ]))
+
 
 (provide
  (contract-out
@@ -34,11 +39,11 @@
             ((dt (in-vector dv))
              (val (in-vector vv)))
     (let ((next (if (and val prev)
-                    (+ (* fraction val)
-                       (* prev-fraction prev))
+                    (fl+ (* fraction val)
+                         (fl* prev-fraction prev))
                     val)))
       (when val
-        (vector-set! out-v (- dt fd) next))
+        (vector-set! out-v (fx- dt fd) next))
       next))
 
   (make-vector-series

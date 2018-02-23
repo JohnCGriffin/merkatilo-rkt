@@ -3,8 +3,12 @@
 (require
  (combine-in
   "private/common-requirements.rkt"
-  racket/unsafe/ops
-  (only-in "private/contracts.rkt" periodic/c)))
+  (only-in "private/contracts.rkt" periodic/c))
+ (rename-in racket/unsafe/ops
+            [unsafe-vector-ref vector-ref]
+            [unsafe-vector-set! vector-set!]
+            [unsafe-fx- fx-]))
+            
 
 (provide (contract-out [ sma periodic/c ]))
 
@@ -22,11 +26,11 @@
     (if (not val)
         (values 0.0 0)
         (let* ((to-drop (if (>= consecutive N)
-                            (unsafe-vector-ref vv (- ndx N))
+                            (vector-ref vv (- ndx N))
                             0))
                (new-total (- (+ total val) to-drop)))
           (when (>= consecutive (sub1 N))
-            (unsafe-vector-set! out-v (- dt fd) (/ new-total fN)))
+            (vector-set! out-v (fx- dt fd) (/ new-total fN)))
           (values new-total (add1 consecutive)))))
 
   (make-vector-series

@@ -36,6 +36,16 @@
 
 
 
+;=======================================
+(module+ main
+  (require "private/test-support.rkt")
+  (printf "1000 iterations: ")
+  (time
+   (with-dates TEST-SERIES
+     (for ((i 1000))
+       (volatility TEST-SERIES)))))
+
+
 ;======================================
 
 (module* test racket/base
