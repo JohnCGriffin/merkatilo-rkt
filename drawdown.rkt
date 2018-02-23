@@ -84,8 +84,11 @@
             (jdate->text (ob-d (drawdown-max result)))
             (ob-v (drawdown-max result))
             (jdate->text (ob-d (drawdown-min result)))
-            (ob-v (drawdown-min result)))))
-
+            (ob-v (drawdown-min result)))
+    (printf "1000 drawdowns: ")
+    (time
+     (for ((i 1000))
+       (series-drawdown TEST-SERIES)))))
 
 ;=============================================
 (module* test racket/base

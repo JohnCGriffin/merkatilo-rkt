@@ -9,19 +9,33 @@
   "../core/series.rkt"
   "vector-series.rkt"))
 
+(define (snag-value-vector dv s)
+  (let ((fd (dated-series-first-date s))
+        (ld (dated-series-last-date s))
+        (vec (vector-series-vec s))
+        (out-v (make-vector (vector-length dv))))
+    (for ((dt (in-vector dv))
+          (ndx (in-naturals)))
+      (define val
+        (and (<= fd dt ld)
+             (unsafe-vector-ref vec (- dt fd))))
+      (unsafe-vector-set! out-v ndx val))
+    (vector->immutable-vector out-v)))
+
 (define (series-dates-values s dv)
+  (define cache (and (vector-series? s)
+                     (vector-series-cache s)))
   (vector->immutable-vector
-   (if (vector-series? s)
-       (let ((fd (dated-series-first-date s))
-             (ld (dated-series-last-date s))
-             (vec (vector-series-vec s))
-             (out-v (make-vector (vector-length dv))))
-         (for ((dt (in-vector dv))
-               (ndx (in-naturals)))
-           (define val
-             (and (<= fd dt ld)
-                  (unsafe-vector-ref vec (- dt fd))))
-           (unsafe-vector-set! out-v ndx val))
-         out-v)
-       (vector-map (series-function s) dv))))
+   (cond
+     ((and cache
+           (eq? (value-cache-dv cache) dv))
+      (value-cache-vv cache))
+     ((vector-series? s)
+      (define snagged (snag-value-vector dv s))
+      (define cache (value-cache dv snagged))
+      (set-vector-series-cache! s cache)
+      snagged)
+     (else
+      (vector-map (series-function s) dv)))))
+
 

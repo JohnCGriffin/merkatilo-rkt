@@ -14,17 +14,20 @@
                            #:vector vector?
                            #:name string?
                            vector-series?)]))
-				   
 
-(struct vector-series dated-series (vec)
+(provide (struct-out value-cache))
+
+(struct value-cache (dv vv))
+
+(struct vector-series dated-series (vec (cache #:mutable))
 
   #:guard
-  (lambda (f n fd ld v type-name)
+  (lambda (f n fd ld v c  type-name)
     (unless (and (vector? v)
                  (eqv? (vector-length v)
                        (add1 (- ld fd))))
       (raise-user-error "(vector-length) != (add1 (- last-date first-date))"))
-    (values f n fd ld (vector->immutable-vector v)))
+    (values f n fd ld (vector->immutable-vector v) #f))
 
   #:methods gen:custom-write
   [(define write-proc
@@ -44,7 +47,7 @@
   (define (F dt)
     (and (<= fd dt ld)
          (vector-ref final-v (- dt fd))))
-  (vector-series F name fd ld final-v))
+  (vector-series F name fd ld final-v #f))
 
 (define (dates-appropriate-fd-and-vec dts)
   (define fd (first-date dts))

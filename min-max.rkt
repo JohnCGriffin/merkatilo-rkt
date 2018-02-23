@@ -49,6 +49,17 @@
 
 
 
+;===========================================================
+
+(module+ main
+  (require "private/test-support.rkt")
+  (with-dates TEST-SERIES
+    (printf "1000 iterations: ")
+    (time
+     (for ((i 1000))
+       (min-max-obs TEST-SERIES)))))
+
+
 ;============================================================
 
 (module* test racket/base
