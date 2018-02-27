@@ -6,7 +6,7 @@
 ;; (in-vector (dateset-vector ...)) call.
 
 (require (only-in racket/contract contract-out -> or/c ->*)
-	 (only-in "private/contracts.rkt" series-name/c S)
+	 (only-in "private/contracts.rkt" series-name? S)
          "core/series.rkt"
          "load.rkt"
          "prepend.rkt"
@@ -16,8 +16,8 @@
  lo-set-dates
  (contract-out
   [ in-dates (->* () (dateset?) sequence?) ]
-  [ lo-or-not (-> series-name/c (or/c #f S)) ]
-  [ lo-prepended (-> series-name/c #:with-surrogate-id series-name/c S) ]))
+  [ lo-or-not (-> series-name? (or/c #f S)) ]
+  [ lo-prepended (-> series-name? #:with-surrogate-id series-name? S) ]))
 
 
 (define (lo-set-dates id)

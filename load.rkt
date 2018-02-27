@@ -17,9 +17,9 @@
 
 (provide
  (contract-out
-  [ current-series-loader (case-> (-> (-> series-name/c series?) void?)
-                                  (-> (-> series-name/c series?)))]
-  [ lo (-> series-name/c series?)]))
+  [ current-series-loader (case-> (-> (-> series-name? series?) void?)
+                                  (-> (-> series-name? series?)))]
+  [ lo (-> series-name? series?)]))
 
 
 (define current-series-loader (make-parameter default-loader))

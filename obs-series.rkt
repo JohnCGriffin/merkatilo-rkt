@@ -3,7 +3,7 @@
 (require
  (combine-in
   (only-in racket/contract contract-out -> ->*)
-  (only-in "private/contracts.rkt" observation-list/c S DS)
+  (only-in "private/contracts.rkt" observation-list? S DS)
   "private/series-dates-values.rkt"
   "core/series.rkt"
   "private/vector-series.rkt"
@@ -11,8 +11,8 @@
 
 (provide
  (contract-out
-  [ obs->series (->* (observation-list/c) (#:name string?) S)]
-  [ series->obs (-> DS S observation-list/c) ]))
+  [ obs->series (->* (observation-list?) (#:name string?) S)]
+  [ series->obs (-> DS S observation-list?) ]))
 
 
 (define (series->obs dts s)

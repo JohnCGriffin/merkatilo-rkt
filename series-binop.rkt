@@ -5,19 +5,19 @@
   "private/common-requirements.rkt"
   "series-map.rkt"
   "constant.rkt"
-  (only-in "private/contracts.rkt" binop/c)))
+  (only-in "private/contracts.rkt" binop?)))
 
 
 (provide
  (contract-out
-  [ add binop/c ]
-  [ sub binop/c ]
-  [ div binop/c ]
-  [ mul binop/c ]
-  [ lt binop/c ]
-  [ le binop/c ]
-  [ gt binop/c ]
-  [ ge binop/c ]))
+  [ add binop? ]
+  [ sub binop? ]
+  [ div binop? ]
+  [ mul binop? ]
+  [ lt binop? ]
+  [ le binop? ]
+  [ gt binop? ]
+  [ ge binop? ]))
 
 (define-syntax-rule (define-binop name op)
   (define (name a b)

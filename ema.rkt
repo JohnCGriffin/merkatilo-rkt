@@ -17,16 +17,14 @@
 (require
  (combine-in
   "private/common-requirements.rkt"
-  (only-in "private/contracts.rkt" periodic/c))
+  (only-in "private/contracts.rkt" periodic?))
  (rename-in racket/unsafe/ops
             [ unsafe-fl* fl* ]
             [ unsafe-fl+ fl+ ]
             [ unsafe-fx- fx- ]))
 
 
-(provide
- (contract-out
-  [ ema periodic/c ]))
+(provide (contract-out [ ema periodic? ]))
 
 
 (define (fractional s _fraction #:dates (dts (current-dates)))

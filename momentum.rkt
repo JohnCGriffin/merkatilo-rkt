@@ -4,15 +4,15 @@
 (require
  (combine-in
   "private/common-requirements.rkt"
-  (only-in "private/contracts.rkt" periodic/c)
+  (only-in "private/contracts.rkt" periodic?)
   "fudge.rkt"
   "repeated.rkt"))
 
 
 (provide
  (contract-out
-  [ mo-days periodic/c ]
-  [ mo periodic/c ]))
+  [ mo-days periodic? ]
+  [ mo periodic? ]))
 
 
 (define (change val old-val)

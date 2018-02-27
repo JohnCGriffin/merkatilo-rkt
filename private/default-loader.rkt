@@ -9,7 +9,7 @@
 
 (provide
  (contract-out
-  [ default-loader (-> series-name/c series?)]))
+  [ default-loader (-> series-name? series?)]))
 
 (define (worker id)
   

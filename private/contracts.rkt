@@ -8,32 +8,32 @@
          "../core/jdate.rkt"
          "../core/dates.rkt")
 
-(define optional-observation/c (or/c #f observation?))
+(define optional-observation? (or/c #f observation?))
 
-(define observation-list/c (or/c (cons/c optional-observation/c list?)
+(define observation-list? (or/c (cons/c optional-observation? list?)
                                  empty?))
 
-(define binop/c (-> (or/c series? real?)
+(define binop? (-> (or/c series? real?)
                     (or/c series? real?)
                     series?))
 
-(define period/c
+(define period?
   (flat-named-contract
    'period
    (lambda (N) (and (integer? N)
 		    (< -10000 N 10000)))))
 
-(define positive-period/c
+(define positive-period?
   (flat-named-contract
    'positive-period
    (lambda (N) (and (integer? N)
-		    (< N 10000)))))
+		    (< -1 N 10000)))))
 
-(define periodic/c (->* (series? positive-period/c)
+(define periodic? (->* (series? positive-period?)
                         (#:dates dateset?)
                         series?))
 
-(define series-name/c (or/c string? symbol?))
+(define series-name? (or/c string? symbol?))
 
 (define S (flat-named-contract 'series series?))
 (define DS (flat-named-contract 'dateset dateset?))

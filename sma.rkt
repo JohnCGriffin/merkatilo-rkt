@@ -3,14 +3,14 @@
 (require
  (combine-in
   "private/common-requirements.rkt"
-  (only-in "private/contracts.rkt" periodic/c))
+  (only-in "private/contracts.rkt" periodic?))
  (rename-in racket/unsafe/ops
             [unsafe-vector-ref vector-ref]
             [unsafe-vector-set! vector-set!]
             [unsafe-fx- fx-]))
             
 
-(provide (contract-out [ sma periodic/c ]))
+(provide (contract-out [ sma periodic? ]))
 
 (define (sma s N #:dates (dts (current-dates)))
 
