@@ -14,24 +14,28 @@
 (struct drawdown (max min) #:transparent)
 
 (define (series-drawdown s #:dates (dts (current-dates)))
-  
-  (define obs (series->obs dts s))
-  (define r-obs (reverse obs))
+
+  (define dv (dateset-vector dts))
+  (define vv (series-dates-values s dv))
 
   (define reversed-minima
-    (for/fold ((acc (list (car r-obs))))
-              ((ob (in-list r-obs))
-               #:when (< (ob-v ob)
-                         (ob-v (car acc))))
-      (cons ob acc)))
+    (for/fold ((acc '()))
+              ((dt (in-vector dv (sub1 (vector-length dv)) -1 -1))
+               (val (in-vector vv (sub1 (vector-length vv)) -1 -1))
+               #:when (and val
+                           (or (null? acc)
+                               (<= val (ob-v (car acc))))))
+      (cons (observation dt val) acc)))
 
   (define maxima
     (reverse
-     (for/fold ((acc (list (car obs))))
-               ((ob (in-list obs))
-                #:when (> (ob-v ob)
-                          (ob-v (car acc))))
-       (cons ob acc))))
+     (for/fold ((acc '()))
+              ((dt (in-vector dv))
+               (val (in-vector vv))
+               #:when (and val
+                           (or (null? acc)
+                               (> val (ob-v (car acc))))))
+       (cons (observation dt val) acc))))
 
   (define (ob-ratio a b)
     (/ (ob-v a) (ob-v b)))
