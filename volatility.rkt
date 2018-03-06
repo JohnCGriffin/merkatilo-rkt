@@ -9,7 +9,7 @@
 (provide
  (contract-out
   [ volatility          (->* (S) (#:days integer? #:dates DS) positive-real?)]
-  [ volatility-residual (->* (S) (#:days integer? #:dates DS) positive-real?)]))
+  #;[ volatility-residual (->* (S) (#:days integer? #:dates DS) positive-real?)]))
 
 
 
@@ -24,14 +24,6 @@
   (define dv (dateset-vector dts))
   (define sv (series-dates-values (mo-days s days) dv))
   (standard-deviation sv))
-
-
-
-(define (volatility-residual s
-                             #:days (days 365)
-                             #:dates (dts (current-dates)))
-  (- 1 (volatility s #:days days #:dates dts)))
-
 
 
 
@@ -58,10 +50,6 @@
     (check-equal?
      (approx (volatility TEST-SERIES))
      (approx 0.038702419488645126))
-    
-    (check-equal?
-     (approx (volatility-residual TEST-SERIES))
-     (approx 0.9612975805113548))
     
     (check-equal?
      (approx (volatility TEST-SERIES #:days 200))

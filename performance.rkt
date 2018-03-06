@@ -62,7 +62,7 @@
                        (equity-line s signals #:alternate-investment alternate-investment)
                        s))
     
-    (define vol-res (volatility-residual equity #:dates dts))
+    (define vol-res (- 1.0 (volatility equity #:dates dts)))
     (define dd-res (drawdown-residual equity #:dates dts))
     (define annualized (gpa equity #:dates dts))
     (define long-ratio
