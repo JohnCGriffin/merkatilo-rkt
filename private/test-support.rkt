@@ -9,6 +9,7 @@
          MO-3-SERIES
          SMA-3-SERIES
          REVERSALS-95-105-SERIES
+         REVERSALS-91-109-SERIES
          CROSS-EMA-30-SERIES
          MO-5-CONVICTION-4-SERIES
          EQUITYLINE-EMA-10
@@ -103,6 +104,7 @@
 (define SMA-3-SERIES (txt-file-series "sma-3"))
 (define MO-3-SERIES (txt-file-series "mo-3"))
 (define REVERSALS-95-105-SERIES (txt-file-series "reversals-95-105"))
+(define REVERSALS-91-109-SERIES (txt-file-series "reversals-91-109"))
 (define CROSS-EMA-30-SERIES (txt-file-series "cross-ema-30"))
 (define MO-5-CONVICTION-4-SERIES (txt-file-series "mo-5-conviction-4"))
 (define EQUITYLINE-EMA-10 (txt-file-series "equityline-ema-10"))

@@ -120,11 +120,5 @@
      (λ ()
        (verify-equivalency
         (reversals TEST-SERIES #:down-factor .91 #:up-factor 1.09)
-        (literal-series '((2012-2-28 1)
-                          (2012-6-1 -1)
-                          (2012-9-7 1)
-                          (2012-11-14 -1)
-                          (2013-01-23 1)
-                          (2014-10-21 -1))))))))
-
+        REVERSALS-91-109-SERIES)))))
 
