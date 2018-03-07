@@ -30,29 +30,32 @@
              (val (in-vector vv))
              #:when val)
 
+    (let ((min-val (ob-v min-ob))
+          (max-val (ob-v max-ob)))
+      
     (cond
       ((and (not (eqv? 1 state))
-            (> val (* (ob-v min-ob) up-factor)))
+            (> val (* min-val up-factor)))
        (let ((date (if nostradamus (ob-d min-ob) dt))
              (ob (observation dt val)))
          (vector-set! out-v (- date fd) 1)
          (values ob ob 1)))
 
       ((and (not (eqv? -1 state))
-            (< val (* (ob-v max-ob) down-factor)))
+            (< val (* max-val down-factor)))
        (let ((date (if nostradamus (ob-d max-ob) dt))
              (ob (observation dt val)))
          (vector-set! out-v (- date fd) -1)
          (values ob ob -1)))
 
-      ((< val (ob-v min-ob))
+      ((< val min-val)
        (values (observation dt val) max-ob state))
 
-      ((> val (ob-v max-ob))
+      ((> val max-val)
        (values min-ob (observation dt val) state))
 
       (else
-       (values min-ob max-ob state))))
+       (values min-ob max-ob state)))))
 
   (make-vector-series
    #:name (format "(~a ~a ~a ~a)"
