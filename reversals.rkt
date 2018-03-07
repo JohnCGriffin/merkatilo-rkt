@@ -21,41 +21,47 @@
   (define up-factor (exact->inexact _up-factor))
   (define-values (dv vv fd out-v) (common-setup s dts))
 
-  (define initial-ob (first-ob s #:dates dts))
+  (define init-ob (first-ob s #:dates dts))
 
-  (for/fold ((min-ob initial-ob)
-             (max-ob initial-ob)
-             (state #f))
+  (struct mms (min-d min-v max-d max-v mode) #:transparent)
+
+  (for/fold ((state (mms (ob-d init-ob)
+                         (ob-v init-ob)
+                         (ob-d init-ob)
+                         (ob-v init-ob)
+                         #f)))
             ((dt (in-vector dv))
              (val (in-vector vv))
              #:when val)
 
-    (let ((min-val (ob-v min-ob))
-          (max-val (ob-v max-ob)))
+    (let ((min-val (mms-min-v state))
+          (max-val (mms-max-v state))
+          (mode (mms-mode state)))
       
     (cond
-      ((and (not (eqv? 1 state))
+      ((and (not (eqv? 1 mode))
             (> val (* min-val up-factor)))
-       (let ((date (if nostradamus (ob-d min-ob) dt))
+       (let ((date (if nostradamus (mms-min-d state) dt))
              (ob (observation dt val)))
          (vector-set! out-v (- date fd) 1)
-         (values ob ob 1)))
+         (mms dt val dt val 1)))
 
-      ((and (not (eqv? -1 state))
+
+      ((and (not (eqv? -1 mode))
             (< val (* max-val down-factor)))
-       (let ((date (if nostradamus (ob-d max-ob) dt))
+       (let ((date (if nostradamus (mms-max-d state) dt))
              (ob (observation dt val)))
          (vector-set! out-v (- date fd) -1)
-         (values ob ob -1)))
+         (mms dt val dt val -1)))
 
       ((< val min-val)
-       (values (observation dt val) max-ob state))
+       (mms dt val (mms-max-d state) (mms-max-v state) (mms-mode state)))
 
       ((> val max-val)
-       (values min-ob (observation dt val) state))
+       (mms (mms-min-d state) (mms-min-v state) dt val (mms-mode state)))
 
       (else
-       (values min-ob max-ob state)))))
+       state))))
 
   (make-vector-series
    #:name (format "(~a ~a ~a ~a)"
