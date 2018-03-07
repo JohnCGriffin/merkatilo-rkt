@@ -23,22 +23,12 @@
 
   (define initial-ob (first-ob s #:dates dts))
 
-  (for/fold ((_min-ob initial-ob)
-             (_max-ob initial-ob)
+  (for/fold ((min-ob initial-ob)
+             (max-ob initial-ob)
              (state #f))
             ((dt (in-vector dv))
              (val (in-vector vv))
              #:when val)
-
-    (define max-ob
-      (if (> val (ob-v _max-ob))
-          (observation dt val)
-          _max-ob))
-
-    (define min-ob
-      (if (< val (ob-v _min-ob))
-          (observation dt val)
-          _min-ob))
 
     (cond
       ((and (not (eqv? 1 state))
@@ -54,6 +44,12 @@
              (ob (observation dt val)))
          (vector-set! out-v (- date fd) -1)
          (values ob ob -1)))
+
+      ((< val (ob-v min-ob))
+       (values (observation dt val) max-ob state))
+
+      ((> val (ob-v max-ob))
+       (values min-ob (observation dt val) state))
 
       (else
        (values min-ob max-ob state))))
