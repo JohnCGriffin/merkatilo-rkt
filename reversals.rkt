@@ -10,6 +10,7 @@
   [ nostradamus (->* (S #:down-factor real? #:up-factor real?) (#:dates DS) S) ]
   [ reversals   (->* (S #:down-factor real? #:up-factor real?) (#:dates DS) S) ]))
 
+(struct mms (min-d min-v max-d max-v mode))
 
 (define (reversals-worker s
                           #:down-factor _down-factor
@@ -22,8 +23,6 @@
   (define-values (dv vv fd out-v) (common-setup s dts))
 
   (define init-ob (first-ob s #:dates dts))
-
-  (struct mms (min-d min-v max-d max-v mode) #:transparent)
 
   (for/fold ((state (mms (ob-d init-ob)
                          (ob-v init-ob)
@@ -41,24 +40,22 @@
     (cond
       ((and (not (eqv? 1 mode))
             (> val (* min-val up-factor)))
-       (let ((date (if nostradamus (mms-min-d state) dt))
-             (ob (observation dt val)))
+       (let ((date (if nostradamus (mms-min-d state) dt)))
          (vector-set! out-v (- date fd) 1)
          (mms dt val dt val 1)))
 
 
       ((and (not (eqv? -1 mode))
             (< val (* max-val down-factor)))
-       (let ((date (if nostradamus (mms-max-d state) dt))
-             (ob (observation dt val)))
+       (let ((date (if nostradamus (mms-max-d state) dt)))
          (vector-set! out-v (- date fd) -1)
          (mms dt val dt val -1)))
 
       ((< val min-val)
-       (mms dt val (mms-max-d state) (mms-max-v state) (mms-mode state)))
+       (mms dt val (mms-max-d state) max-val mode))
 
       ((> val max-val)
-       (mms (mms-min-d state) (mms-min-v state) dt val (mms-mode state)))
+       (mms (mms-min-d state) min-val dt val mode))
 
       (else
        state))))
