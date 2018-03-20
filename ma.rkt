@@ -10,9 +10,10 @@
             [unsafe-fx- fx-]))
             
 
-(provide (contract-out [ sma periodic? ]))
+(provide (contract-out [ ma periodic? ]
+                       [ sma periodic? ]))
 
-(define (sma s N #:dates (dts (current-dates)))
+(define (ma s N #:dates (dts (current-dates)))
 
   (define-values (dv vv fd out-v) (common-setup s dts))
 
@@ -34,12 +35,13 @@
           (values new-total (add1 consecutive)))))
 
   (make-vector-series
-   #:name (format "(sma ~a ~a)" (abbreviate s) N)
+   #:name (format "(ma ~a ~a)" (abbreviate s) N)
    #:vector out-v
    #:first-date fd))
 
 
-
+; temporary compatibility
+(define sma ma)
 
 
 
@@ -49,7 +51,7 @@
   (require "private/test-support.rkt")
   (typical-run
    (λ () TEST-SERIES)
-   (λ () (sma TEST-SERIES 3))))
+   (λ () (ma TEST-SERIES 3))))
 
 
 ;=====================================================
@@ -64,14 +66,14 @@
 
     (check-not-exn
      (λ ()
-       (verify-equivalency (sma TEST-SERIES 3) SMA-3-SERIES)))
+       (verify-equivalency (ma TEST-SERIES 3) SMA-3-SERIES)))
     
     (check-equal?
-     (+ 2 (series-count (sma TEST-SERIES 3)))
+     (+ 2 (series-count (ma TEST-SERIES 3)))
      (series-count TEST-SERIES))
 
     (check-equal?
-     (ob-v (last-ob (sma TEST-SERIES 3)))
+     (ob-v (last-ob (ma TEST-SERIES 3)))
      (/ (+ 340 337 337) 3.0))))
 
 

@@ -52,7 +52,7 @@
 (module* test racket/base
   (require rackunit
            (submod "..")
-           "sma.rkt"
+           "ma.rkt"
            "private/test-support.rkt")
 
   (define (vector-avg v)
@@ -63,7 +63,7 @@
    (λ ()
      (with-dates (dates #:first '2013-1-1 #:last '2013-12-31)
        (verify-equivalency
-        (sma TEST-SERIES 3)
+        (ma TEST-SERIES 3)
         (window-series TEST-SERIES 3 vector-avg)))))
 
   
@@ -71,6 +71,6 @@
    (λ ()
      (with-dates TEST-SERIES
        (verify-equivalency
-        (sma TEST-SERIES 200)
+        (ma TEST-SERIES 200)
         (window-series TEST-SERIES 200 vector-avg))))))
 

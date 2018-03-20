@@ -17,7 +17,8 @@ This is the Racket implementation.
 The purpose of this library is financial computing research and education, not trading
 with material funds at risk.  Use it accordingly.
 
-The code resides at @(hyperlink "https://github.com/JohnCGriffin/merkatilo-rkt" "Github") under MIT licensing.  Corrections, improvements, or other comments are welcome.  Please include merkatilo
+The code resides at @(hyperlink "https://github.com/JohnCGriffin/merkatilo-rkt" "Github") under MIT licensing.
+Corrections, improvements, or other comments are welcome.  Please include merkatilo
 in the subject line.
 
 John Griffin, griffinish at gmail
@@ -27,12 +28,12 @@ John Griffin, griffinish at gmail
 @section{Overview}
 
 The basic data structures are a time series structure that wraps a simple date-to-number
-function, a date, and a dateset which is an ordered collection of dates.  A time series is represented by struct @tt{series} which takes only a date->optional-number function and a name.  It
-is the argument to many functions that beget further
-@tt{series} instances.
+function, a date, and a dateset which is an ordered collection of dates.  A time series
+is represented by struct @tt{series} which takes only a date->optional-number function and a name.
+It is the argument to many functions that beget further @tt{series} instances.
 
 Series creations come in two styles, those requiring 
-a sequence of dates implemented as @tt{dateset}, and those that do not.  For example, the @tt{sma}
+a sequence of dates implemented as @tt{dateset}, and those that do not.  For example, the @tt{ma}
 procedure creates a new series representing a running average of the input series over a
 @tt{dateset}.  However, @tt{add} sums two input series on a date without reference to a
 date sequence.
@@ -47,7 +48,7 @@ dumps them out in date order, like a dumped spreadsheet.
 @racketblock[
 (require merkatilo)
 (define SPY (lo-set-dates 'SPY))
-(define smoothed (sma SPY 200))
+(define smoothed (ma SPY 200))
 (define my-signals
    (cross #:slower smoothed #:faster SPY))
 (dump SPY smoothed my-signals)
@@ -68,8 +69,8 @@ A @tt{jdate?} is simply an integer in [@tt{MIN-DATE} @tt{MAX-DATE}], covering th
 years from 1700 through 2100.  Because it is just an integer, finding the @tt{jdate?} before or
 after another @tt{jdate?} is simple.  Common @tt{jdate?} operations include finding @tt{today}, and
 transforming from and to text representations.  Also note that "text representation" means
-ISO 8601 YYYY-MM-DD.  Text output includes zero-padded month and days for single-digit values; all text output
-of @tt{jdate?} is ten characters in length.
+ISO 8601 YYYY-MM-DD.  Text output includes zero-padded month and days for single-digit values;
+all text output of @tt{jdate?} is ten characters in length.
 
 @deftogether[(@defthing[MIN-DATE jdate?]
               @defthing[MAX-DATE jdate?])]{
@@ -136,7 +137,7 @@ Return the day of the week, 0=Sunday, 6=Saturday.
 @section{Date Sets}
 
 A @tt{dateset} is a wrapper around a strictly ascending immutable vector of @tt{jdate?}.
-Many operations require a dateset to traverse, such as @tt{ema}, @tt{sma}, and 
+Many operations require a dateset to traverse, such as @tt{ema}, @tt{ma}, and 
 @tt{dump}.  In general, the @tt{dateset} is optional and usually found through a
 parameter @tt{current_dates}.  Constructing a @tt{dateset} is best done via the
 @tt{dates} operation which flexibly intersects dates associated with series and
@@ -214,10 +215,19 @@ parameter.
 
 @subsection{Series Smoothings}
 
-To dampen daily movements in a series, two common smoothing operations are the simple
-moving average, @tt{sma}, and the exponential moving average, @tt{ema}.  As with other sequential
+To dampen daily movements in a series, merkatilo has smoothing operations: @tt{ma} (moving average), @tt{ema} (exponential moving average), and @tt{fractional}.  As with other sequential
 operations, a dateset is required.  If not supplied, the
 @tt{current-dates} parameter is used.
+
+@defproc[(fractional [input-series series?] [fraction (0 < fraction < 1)] [#:dates dates dateset? (current-dates)])
+series?]{
+Fractional smoothing multiples the fraction by the current observation plus (1-fraction) times
+the previous result.  The first value or any value following a missing observation is simply the input value.  The number
+of output observations equals the number of input observations. That feature plus stronger weighting of newer
+input makes @tt{fractional} more useful than @tt{ma}.
+
+The default value for @tt{#:dates} is @tt{(current-dates)}.
+}
 
 @defproc[(ema [input-series series?] [N integer?] [#:dates dates dateset? (current-dates)])
 series?]{
@@ -226,20 +236,21 @@ Each observation in the output series is that fraction
 F times the value plus (1-F) times the preceding value.  Thus @tt{ema(IBM,10)}
 will smooth each price
 of IBM such that the current value is weighted 2/11 and 9/11 is multiplied by the previous value.
-The first value or any value following a missing observation is simply the input value.  The number
-of output observations equals the number of input observations. That feature plus stronger weighting of newer
-input makes @tt{ema} more useful than @tt{sma}.
+The fraction F is passed to the more general @tt{fractional} operator.
 
 The default value for @tt{#:dates} is @tt{(current-dates)}.
+
+@italic{Note: EMA stands for 'exponential moving average', 
+a term used by technical analysts to describe
+a process that utilizes neither exponents nor averages.}
 }
 
-@defproc[(sma [input-series series?] [period integer?] [#:dates dates dateset? (current-dates)])
+@defproc[(ma [input-series series?] [period integer?] [#:dates dates dateset? (current-dates)])
 series?]{
 Each output value represents the average of the most current @tt{period} values.  Until that
 number of values is met, there is no output.  Upon encountering a missing observation, the
 output average will be delayed again.  The maximum number of output values in the produced
-series is therefore (period-1) less than the input.  This function matches what most people
-expect of a moving average.  Otherwise, @tt{ema} is a generally better choice.
+series is therefore (period-1) less than the input.  
 
 The default value for @tt{#:dates} is @tt{(current-dates)}.
 }
@@ -273,15 +284,20 @@ generates signals then the SPY ETF price series passes 1% above and 1% below
 its 200-period average.
 
 @racketblock[
-(cross #:slower (sma SPY 200)
+(cross #:slower (ma SPY 200)
        #:faster SPY
        #:upside-factor 1.01
        #:downside-factor .99)
 ]
                                          }
 
-@defproc[(reversals [s series?][#:down-factor down-factor number?][#:up-factor up-factor number?][#:dates dates dateset? current-dates]) series?]{
-When a series ascends above up-factor multiplied by a preceding local minimum, a buy (1) signal is produced.  Upon descending below the product of a local maximum and down-factor, a sell (-1) signal is produced.  For instance, if you want to get out of the stock market after 15% corrections and back in after 10% reversal back up.
+@defproc[(reversals [s series?]
+                    [#:down-factor down-factor number?]
+                    [#:up-factor up-factor number?]
+                    [#:dates dates dateset? current-dates]) series?]{
+When a series ascends above up-factor multiplied by a preceding local minimum, a buy (1) signal is produced.
+Upon descending below the product of a local maximum and down-factor, a sell (-1) signal is produced.
+For instance, if you want to get out of the stock market after 15% corrections and back in after 10% reversal back up.
 
 @racketblock[
 (reversals DJIA #:down-factor .85 #:up-factor 1.1)
@@ -318,7 +334,8 @@ one can generate signals based upon the periodic momentum of a series as in:
 }
 
 @defproc[(calibrate [input series?][#:init init real? 100][#:date date jdate? first-date]) series?]{
-The @tt{calibrate} operator restates a series proportionally to a new value at a specified date.  This is most useful when comparing the progress of one or more price series.  Such a use is
+The @tt{calibrate} operator restates a series proportionally to a new value at a specified date.
+This is most useful when comparing the progress of one or more price series.  Such a use is
 exemplified by a spider chart.
 }
 
@@ -330,9 +347,14 @@ a First Trust sector ETF, one might prepend it with a similar iShares sector ETF
 to approximate history for an analysis the precedes the First Trust inception.
 }
 
-@defproc[(window-series [input series?][n-periods integer?][proc procedure?][#:dates dates dateset current-dates][#:missing-data-permitted missing-data-permitted boolean? #f]) series?]{
-Collect sliding view of input values represented as a vector of length @tt{n-periods}.  The supplied procedure receives the
-vector and responds with a number.  For instance to find 22-day maxima:
+@defproc[(window-series [input series?]
+                        [n-periods integer?]
+                        [proc procedure?]
+                        [#:dates dates dateset current-dates]
+                        [#:missing-data-permitted missing-data-permitted boolean? #f]) series?]{
+Collect sliding view of input values represented as a vector of length @tt{n-periods}.
+The supplied procedure receives the vector and responds with a number.
+For instance to find 22-day maxima:
 @racketblock[
 (window-series input-series 22 (λ (v) (apply max (vector->list v))))
 ]
@@ -461,7 +483,11 @@ value of a series after trading according to those signals. That functionality
 if provided by @tt{equity-line}.
 
 
-@defproc[(equity-line [input series?][signals series?][#:init initial-value real? 100][#:alternate-investment alternate-investment optional-series? constant-value-1][#:dates dates dateset current-dates]) series?]{
+@defproc[(equity-line [input series?]
+                      [signals series?]
+                      [#:init initial-value real? 100]
+                      [#:alternate-investment alternate-investment optional-series? constant-value-1]
+                      [#:dates dates dateset current-dates]) series?]{
     If an alternate investment is not specified, it is set to @tt{(constant 1)} and funds are
     set to @tt{initial-value} dollars.  When a buy signal arrives, all funds purchase the series
     at its price (the value of the series at that signal date), resulting in shares.  Upon
@@ -477,9 +503,10 @@ if provided by @tt{equity-line}.
 }
 
 @defstruct*[drawdown ([max observation?][min observation?])]{
-  Drawdown contains two observations, the earlier being the max observation and
+  Drawdown contains two observations, the earlier being the higher valued observation and
   the latter being a lesser valued observation such that that combination of
-  observed date-value pairs represents the greatest loss in value.
+  observed date-value pairs represents the greatest loss in value over the history
+  of a series.
 }
 
 @defproc[(series-drawdown [input series?][#:dates dates dateset current-dates]) drawdown?]{
@@ -504,7 +531,10 @@ if provided by @tt{equity-line}.
     about 55% back in 2008, so its drawdown-residual is about 0.45.
 }
 
-@defproc[(investment-performance [investment series?][#:alternate-investment alternate-investment series? constant][#:signals signals series? #f][#:dates dates dateset? current-dates]) performance?]{
+@defproc[(investment-performance [investment series?]
+                                 [#:alternate-investment alternate-investment series? constant]
+                                 [#:signals signals series? #f]
+                                 [#:dates dates dateset? current-dates]) performance?]{
 Return the performance structure of trading based upon signals or
 simply return the performance of buy/hold if no signals are supplied.  Don't forgot
 to @tt{warp} the signals by one if you want realistic results to daily end-of-day signals.

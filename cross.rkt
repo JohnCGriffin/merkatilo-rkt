@@ -67,14 +67,14 @@
 
 (module+ main
   (require "private/test-support.rkt"
-           "sma.rkt")
+           "ma.rkt")
 
   (with-dates TEST-SERIES
-	      (define SM3 (sma TEST-SERIES 3))
+	      (define M3 (ma TEST-SERIES 3))
 	      (typical-run
 	       (λ () TEST-SERIES)
-	       (λ () SM3)
-	       (λ () (cross #:faster TEST-SERIES #:slower SM3)))))
+	       (λ () M3)
+	       (λ () (cross #:faster TEST-SERIES #:slower M3)))))
 
 
 
