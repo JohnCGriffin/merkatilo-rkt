@@ -65,27 +65,31 @@
     (define vol-res (- 1.0 (volatility equity #:dates dts)))
     (define dd-res (drawdown-residual equity #:dates dts))
     (define annualized (gpa equity #:dates dts))
-    (define long-ratio
-      (and signals
-           (let ((sig_vals (series-dates-values signals (dateset-vector dts)))
-                 (state #f)
-                 (longs 0)
-                 (total 0))
-             (for ((sig (in-vector sig_vals)))
-               (when sig
-                 (set! state sig))
-               (when state
-                 (set! total (add1 total))
-                 (when (> state 0)
-                   (set! longs (add1 longs)))))
-             (and (> total 0)
-                  (/ longs total)))))
+    (define-values (long-ratio trades)
+      (if signals
+          (let ((sig_vals (series-dates-values signals (dateset-vector dts)))
+                (trades 0)
+                (state #f)
+                (longs 0)
+                (total 0))
+            (for ((sig (in-vector sig_vals)))
+              (when sig
+                (set! trades (add1 trades))
+                (set! state sig))
+              (when state
+                (set! total (add1 total))
+                (when (> state 0)
+                  (set! longs (add1 longs)))))
+            (values (and (> total 0)
+                         (/ longs total))
+                    trades))
+          (values #f #f)))
     
     (performance vol-res
                  dd-res
                  annualized
                  long-ratio
-                 (and signals (series-count signals)))))
+                 trades)))
 
 
 
