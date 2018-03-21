@@ -66,7 +66,7 @@
 
     (check-not-exn
      (λ ()
-       (verify-equivalency (ma TEST-SERIES 3) SMA-3-SERIES)))
+       (verify-equivalency (ma TEST-SERIES 3) MA-3-SERIES)))
     
     (check-equal?
      (+ 2 (series-count (ma TEST-SERIES 3)))

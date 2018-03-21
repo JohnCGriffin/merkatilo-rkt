@@ -43,7 +43,7 @@
 (define (average vec)
   (define-values (N total)
     (for/fold ((N 0)
-               (total 0))
+               (total 0.0))
               ((n (in-vector vec)) #:when n)
       (values (add1 N)
               (+ total n))))
@@ -59,10 +59,9 @@
   (define avg-squared-diff
     (and mean
          (average
-          (vector-map
-           (lambda (n)
-             (define diff (and n (- n mean)))
-             (and diff (fl* diff diff)))
-           vec))))
+          (for/vector ((n (in-vector vec))
+                       #:when n)
+            (define diff (- n mean))
+            (fl* diff diff)))))
   (and avg-squared-diff
        (sqrt avg-squared-diff)))

@@ -7,7 +7,7 @@
 (provide TEST-SERIES
          EMA-3-SERIES
          MO-3-SERIES
-         SMA-3-SERIES
+         MA-3-SERIES
          REVERSALS-95-105-SERIES
          REVERSALS-91-109-SERIES
          CROSS-EMA-30-SERIES
@@ -101,7 +101,7 @@
 
 (define TEST-SERIES (txt-file-series "test-series"))
 (define EMA-3-SERIES (txt-file-series "ema-3"))
-(define SMA-3-SERIES (txt-file-series "sma-3"))
+(define MA-3-SERIES (txt-file-series "ma-3"))
 (define MO-3-SERIES (txt-file-series "mo-3"))
 (define REVERSALS-95-105-SERIES (txt-file-series "reversals-95-105"))
 (define REVERSALS-91-109-SERIES (txt-file-series "reversals-91-109"))

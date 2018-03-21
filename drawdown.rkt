@@ -19,23 +19,33 @@
   (define vv (series-dates-values s dv))
 
   (define reversed-minima
-    (for/fold ((acc '()))
-              ((dt (in-vector dv (sub1 (vector-length dv)) -1 -1))
-               (val (in-vector vv (sub1 (vector-length vv)) -1 -1))
-               #:when (and val
-                           (or (null? acc)
-                               (<= val (ob-v (car acc))))))
-      (cons (observation dt val) acc)))
+    (let ((len (vector-length dv))
+          (mn #f))
+      (for/fold ((acc '()))
+                ((i (in-naturals 1))
+                 (val (in-vector vv (sub1 len) -1 -1))
+                 #:when (and val
+                             (or (not mn)
+                                 (<= val mn))))
+        (define dt (vector-ref dv (- len i)))
+        (define ob (observation dt val))
+        (set! mn val)
+        (cons ob acc))))
 
   (define maxima
-    (reverse
-     (for/fold ((acc '()))
-              ((dt (in-vector dv))
-               (val (in-vector vv))
-               #:when (and val
-                           (or (null? acc)
-                               (> val (ob-v (car acc))))))
-       (cons (observation dt val) acc))))
+    (let ((len (vector-length dv))
+          (mx #f))
+      (reverse
+       (for/fold ((acc '()))
+                 ((i (in-naturals))
+                  (val (in-vector vv))
+                  #:when (and val
+                              (or (not mx)
+                                  (> val mx))))
+         (define dt (vector-ref dv i))
+         (define ob (observation dt val))
+         (set! mx val)
+         (cons ob acc)))))
 
   (define (ob-ratio a b)
     (/ (ob-v a) (ob-v b)))
@@ -91,7 +101,7 @@
             (ob-v (drawdown-min result)))
     (printf "1000 drawdowns: ")
     (time
-     (for ((i 1000))
+     (for ((i 10000))
        (series-drawdown TEST-SERIES)))))
 
 ;=============================================
@@ -101,8 +111,8 @@
            "private/test-support.rkt")
 
   (check-equal?
-     (drawdown-residual TEST-SERIES #:dates (dates TEST-SERIES))
-     (with-dates TEST-SERIES (drawdown-residual TEST-SERIES)))
+   (drawdown-residual TEST-SERIES #:dates (dates TEST-SERIES))
+   (with-dates TEST-SERIES (drawdown-residual TEST-SERIES)))
   
   (with-dates TEST-SERIES
     (define result (series-drawdown TEST-SERIES))
