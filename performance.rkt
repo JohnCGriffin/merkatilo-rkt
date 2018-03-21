@@ -67,10 +67,19 @@
     (define annualized (gpa equity #:dates dts))
     (define long-ratio
       (and signals
-           (let* ((filled (repeated signals #:repeat-last #t))
-                  (longs (series-count (gt filled 0)))
-                  (total (series-count filled)))
-             (/ longs total))))
+           (let ((sig_vals (series-dates-values signals (dateset-vector dts)))
+                 (state #f)
+                 (longs 0)
+                 (total 0))
+             (for ((sig (in-vector sig_vals)))
+               (when sig
+                 (set! state sig))
+               (when state
+                 (set! total (add1 total))
+                 (when (> state 0)
+                   (set! longs (add1 longs)))))
+             (and (> total 0)
+                  (/ longs total)))))
     
     (performance vol-res
                  dd-res
