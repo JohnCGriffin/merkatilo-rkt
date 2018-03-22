@@ -83,7 +83,7 @@
             (values (and (> total 0)
                          (/ longs total))
                     trades))
-          (values #f #f)))
+          (values 0 0)))
     
     (performance vol-res
                  dd-res
