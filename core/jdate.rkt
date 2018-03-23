@@ -140,8 +140,10 @@
      (define CHAR-NINE (char->integer #\9))
      (define (digit c)
        (define val (char->integer c))
-       (and (<= CHAR-ZERO val CHAR-NINE)
-            (- val CHAR-ZERO)))
+       (cond
+         ((<= CHAR-ZERO val CHAR-NINE) (- val CHAR-ZERO))
+         ((eqv? #\- c) #f)
+         (else (raise-user-error 'text->jdate "bad character in text->date"))))
      
      (let loop ((digits (string->list date-string))
                 (y 0)

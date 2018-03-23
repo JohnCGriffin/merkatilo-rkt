@@ -30,10 +30,11 @@
 
 
 (define (serialize-in in-port)
+  (define observation-pattern #px"^\\s*\\d{4}-\\d?\\d-\\d?\\d\\s+-?[0-9\\.]+\\s*$")
   (define (parse-line ln)
-    (define tokens (string-split ln))
-    (define dt (and (eqv? 2 (length tokens))
-                    (->jdate (first tokens) #:check? #t)))
+    (define parseable (regexp-match observation-pattern ln))
+    (define tokens (and parseable (string-split ln)))
+    (define dt (and tokens (->jdate (first tokens))))
     (define val (and dt
                      (exact->inexact (string->number (second tokens)))))
     (and val (observation dt val)))
