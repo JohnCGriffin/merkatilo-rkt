@@ -12,24 +12,34 @@
  (struct-out allocation)
  allocation-equity-line)
 
+(define (pos-real? x)
+  (and (real? x) (positive? x)))
+
 (struct portion (ticker amount)
   #:transparent
-  #:guard (λ (ticker amount _)
-            (if (and (string? ticker)
-                     (> (string-length ticker) 0)
-                     (real? amount)
-                     (positive? amount))
-                (values ticker amount)
-                (raise-user-error 'portion "expected ticker string and positive amount"))))
+  #:guard
+  (λ (ticker amount type-name)
+    (cond
+      [(not (string? ticker))
+       (raise-argument-error type-name "string?" ticker)]
+      [(not (pos-real? amount))
+       (raise-argument-error type-name "positive?" amount)]
+      [else
+       (values ticker amount)])))
+
 
 (struct allocation (date portions)
   #:transparent
-  #:guard (λ (date portions _)
-            (if (and (jdate? date)
-                     (pair? portions)
-                     (andmap portion? portions))
-                (values date portions)
-                (raise-user-error 'allocation "expected jdate date and non-empty list of portions"))))
+  #:guard
+  (λ (date portions type-name)
+    (cond
+      [(not (jdate? date))
+       (raise-argument-error type-name "jdate?" date)]
+      [(not (and (pair? portions) (andmap portion? portions)))
+       (raise-argument-error type-name "(listof? portion?)" portions)]
+      [ else
+        (values date portions)])))
+
 
 (define (normalize-allocation a)
   (define portions (allocation-portions a))
@@ -43,25 +53,33 @@
 
 
 
-
 (struct holding (ticker shares)
   #:transparent
-  #:guard (λ (ticker shares _)
-            (if (and (string? ticker)
-                     (> (string-length ticker) 0)
-                     (real? shares)
-                     (positive? shares))
-                (values ticker shares)
-                (raise-user-error 'holding "expected ticker string and positive shares not (~a,~a)" ticker shares))))
+  #:guard
+  (λ (ticker shares type-name)
+    (cond
+      [(not (string? ticker))
+       (raise-user-error type-name "string?" ticker)]
+      [(not (pos-real? shares))
+       (raise-user-error type-name "positive?" shares)]
+      [else
+       (values ticker shares)])))
+
 
 (struct portfolio (date holdings)
   #:transparent
-  #:guard (λ (date holdings _)
-            (if (and (jdate? date)
-                     (list? holdings)
-                     (andmap holding? holdings))
-                (values date holdings)
-                (raise-user-error 'portfolio "expected jdate date and (possibly empty) list of holdings"))))
+  #:guard
+  (λ (date holdings type-name)
+    (cond
+      [(not (jdate? date))
+       (raise-argument-error type-name "jdate?" date)]
+      [(not (list? holdings))
+       (raise-argument-error type-name "(listof? holding?)" holdings)]
+      [(not (andmap holding? holdings))
+       (raise-argument-error type-name "(listof? holding?)" holdings)]
+      [else
+       (values date holdings)])))
+
 
 
 (define (allocation-equity-line allocations dates)
@@ -149,7 +167,7 @@
     (values (cons new-portfolio acc) new-cash)))
 
 
-#;(module+ main
+(module+ main
   
   (define (dump-allocations allocations)
     (for ((a (in-list allocations)))
