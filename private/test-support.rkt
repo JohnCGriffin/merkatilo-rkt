@@ -5,6 +5,8 @@
 
 
 (provide TEST-SERIES
+         AAA-SERIES
+         BBB-SERIES
          EMA-3-SERIES
          MO-3-SERIES
          MA-3-SERIES
@@ -100,6 +102,8 @@
     (λ () (serialize-in (current-input-port)))))
 
 (define TEST-SERIES (txt-file-series "test-series"))
+(define AAA-SERIES (txt-file-series "aaa"))
+(define BBB-SERIES (txt-file-series "bbb"))
 (define EMA-3-SERIES (txt-file-series "ema-3"))
 (define MA-3-SERIES (txt-file-series "ma-3"))
 (define MO-3-SERIES (txt-file-series "mo-3"))

@@ -1,4 +1,3 @@
-
 #lang racket/base
 
 (require "private/common-requirements.rkt"
@@ -149,7 +148,9 @@
           (map (λ (portion)
                  (define series (portion-series portion))
                  (define sf (series-function series))
-                 (define price (sf date))
+                 (define price
+                   (or (sf date)
+                       (raise-user-error "missing price at ~a" (jdate->text date))))
                  (define amount (portion-amount portion))
                  (define dollars-for-buy (* amount portfolio-value))
                  (define shares-to-buy (/ dollars-for-buy price))
@@ -158,6 +159,27 @@
     (portfolio date holdings)))
 
 
+;==================================================
 
+(module* test racket/base
+  (require rackunit
+           (submod "..")
+           "series-binop.rkt"
+           "calibrate.rkt"
+           "private/test-support.rkt")
 
+  (check-not-exn
+   (λ ()
+     (with-dates AAA-SERIES
+       (define allocations
+         (list
+          (allocation (first-date)
+                      (list (portion AAA-SERIES 1)
+                            (portion BBB-SERIES 1)))))
+       ; given the one-time allocation, the AAA-SERIES and BBB-SERIES gains
+       ; should be averaged (50% each).  So twice the average should be
+       ; the same as AAA-SERIES + BBB-SERIES.
+       (verify-equivalency
+        (mul 2 (allocation-equity-line allocations))
+        (add (calibrate AAA-SERIES) (calibrate BBB-SERIES)))))))
 
