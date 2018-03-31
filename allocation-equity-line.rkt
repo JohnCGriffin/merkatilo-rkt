@@ -1,17 +1,17 @@
 
 #lang racket/base
 
-(require racket/set
-         "private/common-requirements.rkt"
-         "load.rkt"
-         (only-in "convenience.rkt" lo-or-not)
+(require "private/common-requirements.rkt"
          "constant.rkt")
 
 
 (provide
  (struct-out portion)
  (struct-out allocation)
- allocation-equity-line)
+ (contract-out
+  [allocation-equity-line (->* ((listof allocation?))
+                               (#:init 100)
+                               series?)]))
 
 (define (pos-real? x)
   (and (real? x) (positive? x)))
@@ -37,7 +37,7 @@
       [(not (jdate? date))
        (raise-argument-error type-name "jdate?" date)]
       [(not (and (pair? portions) (andmap portion? portions)))
-       (raise-argument-error type-name "(listof? portion?)" portions)]
+       (raise-argument-error type-name "(listof portion?)" portions)]
       [else
        (values date portions)])))
 
@@ -79,26 +79,33 @@
       [(not (jdate? date))
        (raise-argument-error type-name "jdate?" date)]
       [(not (list? holdings))
-       (raise-argument-error type-name "(listof? holding?)" holdings)]
+       (raise-argument-error type-name "(listof holding?)" holdings)]
       [(not (andmap holding? holdings))
-       (raise-argument-error type-name "(listof? holding?)" holdings)]
+       (raise-argument-error type-name "(listof holding?)" holdings)]
       [else
        (values date holdings)])))
 
 
-(define CASH-HOLDING (holding CASH 1))
 
-(define (allocation-equity-line allocations)
+(define (allocation-equity-line allocations #:init (initial-value 100))
+  
+  (define portfolio-history
+    (allocation-history->portfolio-history allocations initial-value))
+  
   (define portfolios-by-date
-    (for/hash ((p (in-list (allocation-history->portfolio-history allocations))))
+    (for/hash ((p (in-list portfolio-history)))
       (values (portfolio-date p) p)))
+  
   (define fd (apply min (hash-keys portfolios-by-date)))
   (define ld (today 1))
-  (define current-portfolio (portfolio (- fd 1) (list CASH-HOLDING)))
+  (define current-portfolio (portfolio (- fd 1)
+                                       (list (holding CASH initial-value))))
   (obs->series
+   #:name "allocation-equity-line"
    (for/list ((dt (in-range fd ld)))
-     (define holding-valuations
-       (let ((tmp (for/list ((h (in-list (portfolio-holdings current-portfolio))))
+     (define holdings (portfolio-holdings current-portfolio))
+     (define portfolio-valuation
+       (let ((tmp (for/list ((h (in-list holdings)))
                     (define shares (holding-shares h))
                     (define series (holding-series h))
                     (define price ((series-function series) dt))
@@ -106,25 +113,28 @@
          (and (andmap real? tmp) tmp)))
      (define new-portfolio (hash-ref portfolios-by-date dt #f))
      (define value
-       (and holding-valuations
-            (apply + holding-valuations)))
+       (and portfolio-valuation
+            (apply + portfolio-valuation)))
+     
      (when (and (not value) new-portfolio)
        (raise-user-error 'allocation-equity-line
                          "missing series observation at allocation date ~a"
                          (jdate->text dt)))
+     
      (when new-portfolio
        (set! current-portfolio new-portfolio))
 
      (and value
           (observation dt value)))))
 
-(define (allocation-history->portfolio-history _allocations)
+
+(define (allocation-history->portfolio-history _allocations initial-value)
 
   (define allocations
     (map normalize-allocation
          (sort _allocations < #:key allocation-date)))
 
-  (define holdings (list (holding CASH 1)))
+  (define holdings (list (holding CASH initial-value)))
 
   (for/list ((a (in-list allocations)))
     (define date (allocation-date a))
@@ -148,62 +158,6 @@
     (portfolio date holdings)))
 
 
-(define ALLOCATIONS (list
-                     (allocation (->jdate '2017-12-26)
-                                 (list (portion (lo "IBM") 30)
-                                       (portion (lo "FXR") 33)
-                                       (portion (lo "SPY") 75)))
-                     (allocation (->jdate '2017-1-19)
-                                 (list (portion (lo "IBM") 123)
-                                       (portion (lo "FXO") 333)
-                                       (portion (lo "SPY") 339)))
-                     (allocation (->jdate '2018-2-8)
-                                 (list (portion (lo "IBM") 22)
-                                       (portion (lo "SPY") 88)))))
-
-(module+ main
-
-    (require "load.rkt"
-             "dump.rkt")
-  
-    (define (dump-allocations allocations)
-      (for ((a (in-list allocations)))
-        (printf "~a" (jdate->text (allocation-date a)))
-        (for ((p (in-list (allocation-portions a))))
-          (printf " ~a:~a" (portion-series p) (portion-amount p)))
-        (printf "\n")))
-  
-    (define (dump-portfolios portfolios)
-      (for ((p (in-list portfolios)))
-        (printf "~a" (jdate->text (portfolio-date p)))
-        (for ((h (in-list (portfolio-holdings p))))
-          (printf " ~a:~a" (holding-series h) (holding-shares h)))
-        (printf "\n")))
-  
-    (define allocations
-      (list
-       (allocation (->jdate '2017-12-26)
-                   (list (portion (lo "IBM") 30)
-                         (portion (lo "FXR") 33)
-                         (portion (lo "SPY") 75)))
-       (allocation (->jdate '2017-1-19)
-                   (list (portion (lo "IBM") 123)
-                         (portion (lo "FXO") 333)
-                         (portion (lo "SPY") 339)))
-       (allocation (->jdate '2018-2-8)
-                   (list (portion (lo "IBM") 22)
-                         (portion (lo "SPY") 88)))))
-
-    (printf "raw\n")
-    (dump-allocations allocations)
-    (printf "normalized\n")
-    (dump-allocations (map normalize-allocation allocations))
-    (printf "\n\n")
-    (dump-portfolios (allocation-history->portfolio-history allocations))
-    (define result (allocation-equity-line allocations))
-    (define SPY (lo "SPY"))
-    (with-dates result
-        (dump result)))
 
 
 
