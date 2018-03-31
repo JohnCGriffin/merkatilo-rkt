@@ -13,7 +13,8 @@
   (only-in racket/contract contract-out -> case->)
   "private/contracts.rkt"
   "core/series.rkt"
-  "private/default-loader.rkt"))
+  "private/default-loader.rkt"
+  "rename-series.rkt"))
 
 (provide
  (contract-out
@@ -33,7 +34,7 @@
         (format "~a::CLOSE" string-id)))
   (define id (normalize-load-id original-id))
   (define loader (current-series-loader))
-  (loader id))
+  (rename-series (loader id) original-id))
 
 
 

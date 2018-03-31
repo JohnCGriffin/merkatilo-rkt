@@ -15,17 +15,17 @@
 (define (pos-real? x)
   (and (real? x) (positive? x)))
 
-(struct portion (ticker amount)
+(struct portion (series amount)
   #:transparent
   #:guard
-  (λ (ticker amount type-name)
+  (λ (series amount type-name)
     (cond
-      [(not (string? ticker))
-       (raise-argument-error type-name "string?" ticker)]
+      [(not (series? series))
+       (raise-argument-error type-name "series?" series)]
       [(not (pos-real? amount))
        (raise-argument-error type-name "positive?" amount)]
       [else
-       (values ticker amount)])))
+       (values series amount)])))
 
 
 (struct allocation (date portions)
@@ -37,33 +37,33 @@
        (raise-argument-error type-name "jdate?" date)]
       [(not (and (pair? portions) (andmap portion? portions)))
        (raise-argument-error type-name "(listof? portion?)" portions)]
-      [ else
+      [else
         (values date portions)])))
 
 
 (define (normalize-allocation a)
   (define portions (allocation-portions a))
-  (define tickers (map portion-ticker portions))
+  (define seriesz (map portion-series portions))
   (define amounts (map portion-amount portions))
   (define sum (for/sum ((n (in-list amounts))) n))
   (allocation (allocation-date a)
-              (for/list ((ticker (in-list tickers))
+              (for/list ((series (in-list seriesz))
                          (amount (in-list amounts)))
-                (portion ticker (/ amount sum)))))
+                (portion series (/ amount sum)))))
 
 
 
-(struct holding (ticker shares)
+(struct holding (series shares)
   #:transparent
   #:guard
-  (λ (ticker shares type-name)
+  (λ (series shares type-name)
     (cond
-      [(not (string? ticker))
-       (raise-user-error type-name "string?" ticker)]
+      [(not (series? series))
+       (raise-user-error type-name "series?" series)]
       [(not (pos-real? shares))
        (raise-user-error type-name "positive?" shares)]
       [else
-       (values ticker shares)])))
+       (values series shares)])))
 
 
 (struct portfolio (date holdings)
@@ -101,8 +101,8 @@
        (+ cash
           (for/sum ((h (in-list (portfolio-holdings current-portfolio))))
             (define shares (holding-shares h))
-            (define ticker (holding-ticker h))
-            (define price ((series-function (lo ticker)) dt))
+            (define series (holding-series h))
+            (define price ((series-function series) dt))
             (* shares price))))
      (define new-portfolio (hash-ref portfolios-by-date dt #f))
      (when new-portfolio
@@ -119,7 +119,7 @@
     (map normalize-allocation
          (sort _allocations < #:key allocation-date)))
 
-  (define date-ticker-price
+  #;(define date-ticker-price
     (let ((h (make-hash)))
       
       (λ (date ticker)
@@ -149,51 +149,55 @@
     (define portfolio-value
       (+ cash
          (for/sum ((h (in-list holdings)))
-           (define ticker (holding-ticker h))
+           (define sf (series-function (holding-series h)))
            (define shares (holding-shares h))
-           (define price (date-ticker-price date ticker))
+           (define price (sf date))
            (* shares price))))
     (define new-holdings
       (map (λ (portion)
-             (define ticker (portion-ticker portion))
-             (define price (date-ticker-price date ticker))
+             (define series (portion-series portion))
+             (define sf (series-function series))
+             (define price (sf date))
              (define amount (portion-amount portion))
              (define dollars-for-buy (* amount portfolio-value))
              (define shares-to-buy (/ dollars-for-buy price))
-             (holding ticker shares-to-buy))
+             (holding series shares-to-buy))
            portions))
     (define new-cash (if (pair? new-holdings) 0 portfolio-value))
     (define new-portfolio (portfolio date new-holdings))
     (values (cons new-portfolio acc) new-cash)))
 
 
+
 (module+ main
+
+  (require "load.rkt")
   
   (define (dump-allocations allocations)
     (for ((a (in-list allocations)))
       (printf "~a" (jdate->text (allocation-date a)))
       (for ((p (in-list (allocation-portions a))))
-        (printf " ~a:~a" (portion-ticker p) (portion-amount p)))
+        (printf " ~a:~a" (portion-series p) (portion-amount p)))
       (printf "\n")))
   
   (define (dump-portfolios portfolios)
     (for ((p (in-list portfolios)))
       (printf "~a" (jdate->text (portfolio-date p)))
       (for ((h (in-list (portfolio-holdings p))))
-        (printf " ~a:~a" (holding-ticker h) (holding-shares h)))
+        (printf " ~a:~a" (holding-series h) (holding-shares h)))
       (printf "\n")))
   
   (define allocations
     (list
      (allocation (->jdate '2017-12-26)
-                 (list (portion "IBM" 30)
-                       (portion "SPY" 75)))
+                 (list (portion (lo "IBM") 30)
+                       (portion (lo "SPY") 75)))
      (allocation (->jdate '2017-1-19)
-                 (list (portion "IBM" 123)
-                       (portion "SPY" 339)))
+                 (list (portion (lo "IBM") 123)
+                       (portion (lo "SPY") 339)))
      (allocation (->jdate '2018-2-8)
-                 (list (portion "IBM" 22)
-                       (portion "SPY" 88)))))
+                 (list (portion (lo "IBM") 22)
+                       (portion (lo "SPY") 88)))))
 
   (printf "raw\n")
   (dump-allocations allocations)
