@@ -45,13 +45,14 @@
              (alt (in-vector alt-v))
              (inv (in-vector inv-v))
              (sig (in-vector sig-v))
-             #:when (or (and inv alt) sig))
+             #:when (and (>= dt first-sig-date)
+                         (or (and inv alt) sig)))
     
     (define change
       (cond
         ((not inv) (oops "missing investment observation at ~a" dt))
         ((not alt) (oops "missing alternative investment observation at ~a" dt))
-        ((fx<= dt first-sig-date) 1.0)
+        #;((fx<= dt first-sig-date) 1.0)
         (buy? (if prev-inv (/ inv prev-inv) 1.0))
         (else (if prev-alt (/ alt prev-alt) 1.0))))
 

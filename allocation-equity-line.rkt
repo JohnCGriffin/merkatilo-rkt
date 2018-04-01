@@ -168,9 +168,35 @@
   (require rackunit
            (submod "..")
            "series-binop.rkt"
+           "signals.rkt"
+           "momentum.rkt"
+           "constant.rkt"
            "calibrate.rkt"
+           "obs-series.rkt"
            "dump.rkt"
+           "equity-line.rkt"
+           "series-logic.rkt"
            "private/test-support.rkt")
+
+  
+
+  ;; allocation-equity-line with all weight to either AAA-SERIES
+  ;; or cash is the same as having signals on those dates.
+  (check-not-exn
+   (λ ()
+     (with-dates AAA-SERIES
+       (define CASH (constant 1))
+       (define sigs (to-signals (mo AAA-SERIES 100)))
+       (define sig-obs (series->obs (current-dates) sigs))
+       (define allocations
+         (map (λ (o)
+                (define val (ob-v o))
+                (define dt (ob-d o))
+                (define S (if (positive? val) AAA-SERIES CASH))
+                (allocation dt (list (portion S 1)))) sig-obs))
+       (define a-equity (allocation-equity-line allocations))
+       (define t-equity (equity-line AAA-SERIES sigs))
+       (verify-equivalency a-equity t-equity))))
 
   (check-not-exn
    (λ ()

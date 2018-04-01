@@ -483,7 +483,8 @@ Whether developing signals or allocations, evaluation of goodness requires that
 you build an equity line reflecting the result of changing investment states.
 That functionality
 is provided by @tt{equity-line} when using signals and @tt{allocation-equity-line}
-for asset allocation or rebalancing.
+for asset allocation or rebalancing.  Both types of equity lines start on the first
+signal or allocation.
 
 
 @defproc[(equity-line [input series?]
