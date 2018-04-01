@@ -91,18 +91,20 @@
   (define portfolio-history
     (allocation-history->portfolio-history allocations initial-value))
   
-  (define portfolios-by-date
+  (define holdings-by-date
     (for/hash ((p (in-list portfolio-history)))
-      (values (portfolio-date p) p)))
+      (values (portfolio-date p)
+              (portfolio-holdings p))))
   
-  (define fd (apply min (hash-keys portfolios-by-date)))
+  (define fd (apply min (hash-keys holdings-by-date)))
   (define ld (today 1))
-  (define current-portfolio (portfolio (- fd 1)
-                                       (list (holding CASH initial-value))))
+  (define holdings (list (holding CASH initial-value)))
+  
   (obs->series
    #:name "allocation-equity-line"
+   
    (for/list ((dt (in-range fd ld)))
-     (define holdings (portfolio-holdings current-portfolio))
+     
      (define portfolio-valuation
        (let ((tmp (for/list ((h (in-list holdings)))
                     (define shares (holding-shares h))
@@ -110,18 +112,19 @@
                     (define price ((series-function series) dt))
                     (and price (* shares price)))))
          (and (andmap real? tmp) tmp)))
-     (define new-portfolio (hash-ref portfolios-by-date dt #f))
+     
+     (define new-holdings (hash-ref holdings-by-date dt #f))
+     
      (define value
        (and portfolio-valuation
             (apply + portfolio-valuation)))
-     
-     (when (and (not value) new-portfolio)
-       (raise-user-error 'allocation-equity-line
-                         "missing series observation at allocation date ~a"
-                         (jdate->text dt)))
-     
-     (when new-portfolio
-       (set! current-portfolio new-portfolio))
+
+     (when new-holdings
+       (unless value
+         (raise-user-error 'allocation-equity-line
+                           "missing series observation at allocation date ~a"
+                           (jdate->text dt)))
+       (set! holdings new-holdings))
 
      (and value
           (observation dt value)))))
