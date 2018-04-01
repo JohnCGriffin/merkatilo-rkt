@@ -95,14 +95,14 @@
     (for/hash ((p (in-list portfolio-history)))
       (values (portfolio-date p)
               (portfolio-holdings p))))
-  
-  (define fd (apply min (hash-keys holdings-by-date)))
+
+  (define fd (portfolio-date (car portfolio-history)))
   (define ld (today 1))
   (define holdings (list (holding CASH initial-value)))
   
   (obs->series
    #:name "allocation-equity-line"
-   
+
    (for/list ((dt (in-range fd ld)))
      
      (define portfolio-valuation
