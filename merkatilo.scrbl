@@ -471,16 +471,19 @@ passes the predicate.  For instance, @tt{(gt IBM 100)} is equivalent to
 @section{Performance Measures}
 
 If you are developing signals, you must be interested in how "good" those
-signals are.  Good means many things to many people; some value 
+signals are. Likewise, if you are developing an asset allocation system,
+you need to know how good the rebalanced asset system is.
+Good means many things to many people; some value 
 the total money earned over the lifetime of a model, while others value risk
 avoidance.  That quantification of goodness is likely constructed from a combination
 of aiming for low return volatility, high returns and mimimizing unrealized
 losses.
 
-Finally, to apply trading signals to what you consider to be goodness,
-you will need to build an equity line representing the
-value of a series after trading according to those signals. That functionality
-if provided by @tt{equity-line}.
+Whether developing signals or allocations, evaluation of goodness requires that
+you build an equity line reflecting the result of changing investment states.
+That functionality
+is provided by @tt{equity-line} when using signals and @tt{allocation-equity-line}
+for asset allocation or rebalancing.
 
 
 @defproc[(equity-line [input series?]
@@ -500,6 +503,27 @@ if provided by @tt{equity-line}.
 
     The output of @tt{equity-line} is what you will likely use with the performance measures
     of gain, drawdown and volatility.
+}
+
+@defproc[(allocation-equity-line [allocations (listof allocation?) ]
+[#:init initial-value real? 100]) series?]{
+  Rather than a signal based equity-line using signals on dates, an allocation-equity-line specifies
+  portfolio weightings on dates and generates an equity line with respect to the specified
+  rebalancings of a portfolio.
+  An allocation structure contains a jdate and a portion? list where a portion struct
+  contains a series and a weight.  For instance, to double-weight a financial ETF (FXO)
+  and single-weight an energy sector (FXN) which is rebalanced on the 15th of each month, the
+  creation of the equity line might look like:
+
+@racketblock[
+(define 15ths (some-way-to-get-15ths ...))
+(define weightings (list (portion FXO 2) (portion FXN 1)))
+(define allocations
+   (map (λ (dt) (allocation dt weightings)) 15ths))
+(define rebalanced-equity-line
+   (allocation-equity-line allocations))
+]
+
 }
 
 @defstruct*[drawdown ([max observation?][min observation?])]{
