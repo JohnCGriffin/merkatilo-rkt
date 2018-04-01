@@ -89,7 +89,7 @@
 (define (allocation-equity-line allocations #:init (initial-value 100))
   
   (define portfolio-history
-    (allocation-history->portfolio-history allocations initial-value))
+    (allocation-history->portfolio-history allocations))
   
   (define holdings-by-date
     (for/hash ((p (in-list portfolio-history)))
@@ -98,7 +98,7 @@
 
   (define fd (portfolio-date (car portfolio-history)))
   (define ld (today 1))
-  (define holdings (list (holding CASH initial-value)))
+  (define holdings (list (holding CASH 1)))
   
   (obs->series
    #:name "allocation-equity-line"
@@ -127,16 +127,16 @@
        (set! holdings new-holdings))
 
      (and value
-          (observation dt value)))))
+          (observation dt (* initial-value value))))))
 
 
-(define (allocation-history->portfolio-history _allocations initial-value)
+(define (allocation-history->portfolio-history _allocations)
 
   (define allocations
     (map normalize-allocation
          (sort _allocations < #:key allocation-date)))
 
-  (define holdings (list (holding CASH initial-value)))
+  (define holdings (list (holding CASH 1)))
 
   (for/list ((a (in-list allocations)))
     (define date (allocation-date a))
@@ -169,6 +169,7 @@
            (submod "..")
            "series-binop.rkt"
            "calibrate.rkt"
+           "dump.rkt"
            "private/test-support.rkt")
 
   (check-not-exn
@@ -179,6 +180,7 @@
           (allocation (first-date)
                       (list (portion AAA-SERIES 1)
                             (portion BBB-SERIES 1)))))
+       #;(dump (allocation-equity-line allocations))
        ; given the one-time allocation, the AAA-SERIES and BBB-SERIES gains
        ; should be averaged (50% each).  So twice the average should be
        ; the same as AAA-SERIES + BBB-SERIES.
