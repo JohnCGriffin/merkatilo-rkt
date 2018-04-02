@@ -1,7 +1,8 @@
 #lang racket/base
 
 (require "private/common-requirements.rkt"
-         "constant.rkt")
+         "constant.rkt"
+         (only-in racket/list check-duplicates))
 
 
 (provide
@@ -37,6 +38,8 @@
        (raise-argument-error type-name "jdate?" date)]
       [(not (and (pair? portions) (andmap portion? portions)))
        (raise-argument-error type-name "(listof portion?)" portions)]
+      [(check-duplicates (map portion-series portions))
+       (raise-argument-error type-name "duplicate series supplied to allocation" portions)]
       [else
        (values date portions)])))
 
@@ -153,12 +156,20 @@
   (check-exn
    exn:fail?
    (λ ()
-     (allocation (->jdate "2018-1-1") -1)))
+     (allocation (->jdate "2018-1-1") '())))
 
   (check-exn
    exn:fail?
    (λ ()
-     (allocation "2018-1-1" 10)))
+     (allocation "2018-1-1" '())))
+
+  (check-exn
+   exn:fail?
+   (λ ()
+     (allocation (->jdate "2018-1-1")
+                 (list (portion AAA-SERIES 10)
+                       (portion BBB-SERIES 20)
+                       (portion AAA-SERIES 10)))))
 
 
   ;; allocation-equity-line with all weight to either AAA-SERIES
