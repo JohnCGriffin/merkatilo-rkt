@@ -85,6 +85,14 @@
        (values date holdings)])))
 
 
+(define (holdings-valuation date holdings)
+  (let ((tmp (for/list ((h (in-list holdings)))
+               (define shares (holding-shares h))
+               (define series (holding-series h))
+               (define price ((series-function series) date))
+               (and price (* shares price)))))
+    (and (andmap real? tmp)
+         (apply + tmp))))
 
 (define (allocation-equity-line allocations #:init (initial-value 100))
   
@@ -105,29 +113,19 @@
 
    (for/list ((dt (in-range fd ld)))
      
-     (define portfolio-valuation
-       (let ((tmp (for/list ((h (in-list holdings)))
-                    (define shares (holding-shares h))
-                    (define series (holding-series h))
-                    (define price ((series-function series) dt))
-                    (and price (* shares price)))))
-         (and (andmap real? tmp) tmp)))
+     (define valuation (holdings-valuation dt holdings))
      
      (define new-holdings (hash-ref holdings-by-date dt #f))
      
-     (define value
-       (and portfolio-valuation
-            (apply + portfolio-valuation)))
-
      (when new-holdings
-       (unless value
+       (unless valuation
          (raise-user-error 'allocation-equity-line
                            "missing series observation at allocation date ~a"
                            (jdate->text dt)))
        (set! holdings new-holdings))
 
-     (and value
-          (observation dt (* initial-value value))))))
+     (and valuation
+          (observation dt (* initial-value valuation))))))
 
 
 (define (allocation-history->portfolio-history _allocations)
@@ -141,12 +139,7 @@
   (for/list ((a (in-list allocations)))
     (define date (allocation-date a))
     (define portions (allocation-portions a))
-    (define portfolio-value
-      (for/sum ((h (in-list holdings)))
-        (define sf (series-function (holding-series h)))
-        (define shares (holding-shares h))
-        (define price (sf date))
-        (* shares price)))
+    (define valuation (holdings-valuation date holdings))
     (set! holdings
           (map (λ (portion)
                  (define series (portion-series portion))
@@ -155,7 +148,7 @@
                    (or (sf date)
                        (raise-user-error "missing price at ~a" (jdate->text date))))
                  (define amount (portion-amount portion))
-                 (define dollars-for-buy (* amount portfolio-value))
+                 (define dollars-for-buy (* amount valuation))
                  (define shares-to-buy (/ dollars-for-buy price))
                  (holding series shares-to-buy))
                portions))
@@ -178,7 +171,6 @@
            "series-logic.rkt"
            "private/test-support.rkt")
 
-  
 
   ;; allocation-equity-line with all weight to either AAA-SERIES
   ;; or cash is the same as having signals on those dates.
