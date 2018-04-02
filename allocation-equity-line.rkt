@@ -57,35 +57,11 @@
 
 
 
-(struct holding (series shares)
-  #:transparent
-  #:guard
-  (λ (series shares type-name)
-    (cond
-      [(not (series? series))
-       (raise-user-error type-name "series?" series)]
-      [(not (pos-real? shares))
-       (raise-user-error type-name "positive?" shares)]
-      [else
-       (values series shares)])))
+(struct holding (series shares) #:transparent)
+(struct portfolio (date holdings) #:transparent)
 
 
-(struct portfolio (date holdings)
-  #:transparent
-  #:guard
-  (λ (date holdings type-name)
-    (cond
-      [(not (jdate? date))
-       (raise-argument-error type-name "jdate?" date)]
-      [(not (list? holdings))
-       (raise-argument-error type-name "(listof holding?)" holdings)]
-      [(not (andmap holding? holdings))
-       (raise-argument-error type-name "(listof holding?)" holdings)]
-      [else
-       (values date holdings)])))
-
-
-(define (holdings-valuation date holdings)
+(define (value-of-holdings date holdings)
   (let ((tmp (for/list ((h (in-list holdings)))
                (define shares (holding-shares h))
                (define series (holding-series h))
@@ -106,7 +82,7 @@
   (for/list ((a (in-list allocations)))
     (define date (allocation-date a))
     (define portions (allocation-portions a))
-    (define valuation (holdings-valuation date holdings))
+    (define valuation (value-of-holdings date holdings))
     (set! holdings
           (map (λ (portion)
                  (define series (portion-series portion))
@@ -140,7 +116,7 @@
 
    (for/list ((dt (in-range fd ld)))
      
-     (define valuation (holdings-valuation dt holdings))
+     (define valuation (value-of-holdings dt holdings))
      
      (define new-holdings (hash-ref holdings-by-date dt #f))
      
@@ -172,6 +148,17 @@
            "equity-line.rkt"
            "series-logic.rkt"
            "private/test-support.rkt")
+
+
+  (check-exn
+   exn:fail?
+   (λ ()
+     (allocation (->jdate "2018-1-1") -1)))
+
+  (check-exn
+   exn:fail?
+   (λ ()
+     (allocation "2018-1-1" 10)))
 
 
   ;; allocation-equity-line with all weight to either AAA-SERIES
