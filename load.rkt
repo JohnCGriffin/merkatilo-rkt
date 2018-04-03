@@ -34,7 +34,7 @@
         (format "~a::CLOSE" string-id)))
   (define id (normalize-load-id original-id))
   (define loader (current-series-loader))
-  (rename-series (loader id) original-id))
+  (rename-series (loader id) id))
 
 
 
