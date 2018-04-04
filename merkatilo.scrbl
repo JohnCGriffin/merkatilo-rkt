@@ -47,14 +47,17 @@ dumps them out in date order, like a dumped spreadsheet.
 
 @racketblock[
 (require merkatilo)
+
 (define SPY (lo-set-dates 'SPY))
 (define smoothed (ma SPY 200))
 (define my-signals
    (cross #:slower smoothed #:faster SPY))
+
 (dump SPY smoothed my-signals)
 ]
 
-Please note that if you attempt to do the example above, it will not work.  That is because
+Please note that if you attempt to do the example above,
+@italic{it will not work}.  That is because
 this library manipulates times series; it does not provide financial data.  You have to come up
 with that yourself.  If you have no data source, investigate using the St. Louis
 Federal Reserve @(hyperlink "https://fred.stlouisfed.org/" "FRED database"),
@@ -419,7 +422,7 @@ analogous to @tt{gt} using >= comparision
 }
 
 @defproc[(lt [a series-or-real?][b series-or-real?]) series?]{
-analogous to @tt{gt} using > comparision
+analogous to @tt{gt} using < comparision
 }
 
 @defproc[(le [a series-or-real?][b series-or-real?]) series?]{
