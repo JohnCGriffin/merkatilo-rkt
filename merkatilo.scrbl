@@ -577,8 +577,26 @@ This tells the @tt{lo} operator how to fetch series from an id.  The id is norma
 a string in the form of TICKER::SUBJECT, e.g. IBM::VOLUME.  Without the double colon
 second part, ::CLOSE is assumed.  Thus, @tt{'IBM} or @tt{"IBM"} is normalized to @tt{"IBM::CLOSE"}
 and your
-loader returns the series.  A supplied default loader reads from ASCII files in
-@tt{~/TIME_SERIES}.
+loader returns the series.
+
+The supplied default loader reads from ASCII streams containing date-value lines
+at URL locations
+specified in @tt{/etc/merkatilo/default-loader-config.json}.  Here's a sample config file:
+
+@codeblock|{
+{
+  "cache-seconds" : 3600,
+  "data-source" : {
+    "regex"       : "^([A-Z][A-Z0-9]*)::([A-Z0-9]+)$",
+    "replacement" : "https://mydata-provider.net/ticker=?\\1&record=\\2"
+  }
+}
+}|
+
+The supplied loader works fine for the original author's needs.
+If the supplied loader will not work for you, then simply make your own loader and set the
+@tt{current-loader} parameter to make @tt{lo} fit your needs.
+
 }
 
 @defproc[(lo [id symbol-or-string?]) series?]{
