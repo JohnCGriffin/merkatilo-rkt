@@ -82,6 +82,7 @@
             (values y m d)))
 
 (define (jdate->ymd julian)
+  ; http://www.stiltner.org/book/bookcalc.htm
   (let* ((JD (inexact->exact (round julian)))
          (L (+ JD 68569))
          (N (quotient (* 4 L) 146097)))
