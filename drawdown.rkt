@@ -8,7 +8,9 @@
  (contract-out
   [ drawdown-residual (-> drawdown? real?)]
   [ series-drawdown   (->* (S) (#:dates DS) (or/c drawdown? #f)) ]
-  [ all-drawdowns     (->* (S) (#:dates DS #:max-residual real?) (listof drawdown?)) ]))
+  [ all-drawdowns     (->* (S)
+                           (#:dates DS #:max-residual (between/c 0 1))
+                           (listof drawdown?)) ]))
 
 
 
@@ -96,7 +98,7 @@
 
 (define (all-drawdowns s
                        #:dates (dts (current-dates))
-                       #:max-residual (max-residual .9))
+                       #:max-residual (max-residual 1))
   
   (define (worker s the-dates)
 
