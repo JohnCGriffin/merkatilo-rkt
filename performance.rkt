@@ -63,7 +63,7 @@
                        s))
     
     (define vol-res (- 1.0 (volatility equity #:dates dts)))
-    (define dd-res (drawdown-residual equity #:dates dts))
+    (define dd-res (drawdown-residual (series-drawdown equity #:dates dts)))
     (define annualized (gpa equity #:dates dts))
     (define-values (long-ratio trades)
       (if signals
