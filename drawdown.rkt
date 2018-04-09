@@ -8,7 +8,7 @@
  (contract-out
   [ drawdown-residual (-> drawdown? real?)]
   [ series-drawdown   (->* (S) (#:dates DS) (or/c drawdown? #f)) ]
-  [ all-drawdowns     (->* (S)
+  [ series-drawdowns  (->* (S)
                            (#:dates DS #:max-residual (between/c 0 1))
                            (listof drawdown?)) ]))
 
@@ -96,7 +96,7 @@
 
 
 
-(define (all-drawdowns s
+(define (series-drawdowns s
                        #:dates (dts (current-dates))
                        #:max-residual (max-residual 1))
   
@@ -128,7 +128,7 @@
 (module+ main
   (require "private/test-support.rkt")
   (with-dates TEST-SERIES
-    (define all (all-drawdowns TEST-SERIES #:max-residual .92))
+    (define all (series-drawdowns TEST-SERIES #:max-residual .92))
     (define result (series-drawdown TEST-SERIES))
     (printf "~a\n" (map drawdown-residual all))
     (printf "(~a ~a) -> (~a ~a)\n"
@@ -153,16 +153,16 @@
 
   (check-equal?
    (map (λ (dd) (approx (drawdown-residual dd)))
-        (all-drawdowns TEST-SERIES #:max-residual .92 #:dates (dates TEST-SERIES)))
+        (series-drawdowns TEST-SERIES #:max-residual .92 #:dates (dates TEST-SERIES)))
    (map approx '(0.889196675900277 0.9038461538461539 0.9046052631578947)))
 
   (with-dates TEST-SERIES
     (check-equal?
-     (length (all-drawdowns TEST-SERIES #:max-residual .95))
+     (length (series-drawdowns TEST-SERIES #:max-residual .95))
      8)
     (check-equal?
      (series-drawdown TEST-SERIES)
-     (car (all-drawdowns TEST-SERIES))))
+     (car (series-drawdowns TEST-SERIES))))
   
   (with-dates TEST-SERIES
     (define result (series-drawdown TEST-SERIES))
