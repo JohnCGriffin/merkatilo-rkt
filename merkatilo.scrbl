@@ -39,7 +39,7 @@ procedure creates a new series representing a running average of the input serie
 date sequence.
 
 Speaking of dates, with merkatilo, they are called @tt{jdate}, meaning julian date.  The
-julian date coincides with Postgres' idea of a julian.
+merkatilo julian date coincides with Postgres' julian date value.
 
 Here's an example that loads the SPY ETF adjusted closing price, does a cross of that series
 with its 200-period moving average, generating buy (+1) and sell (-1) signals.  Finally, it
@@ -60,9 +60,8 @@ Please note that if you attempt to do the example above,
 @italic{it will not work}.  That is because
 this library manipulates times series; it does not provide financial data.  You have to come up
 with that yourself.  If you have no data source, investigate using the St. Louis
-Federal Reserve @(hyperlink "https://fred.stlouisfed.org/" "FRED database"),
-@(hyperlink "https://data.oecd.org/" "OECD"), and
-@(hyperlink "https://www.quandl.com/" "Quandl").
+Federal Reserve @(hyperlink "https://fred.stlouisfed.org/" "FRED database").
+
 
 @;--------------------------------------
 
@@ -73,11 +72,11 @@ years from 1700 through 2100.  Because it is just an integer, finding the @tt{jd
 after another @tt{jdate?} is simple.  Common @tt{jdate?} operations include finding @tt{today}, and
 transforming from and to text representations.  Also note that "text representation" means
 ISO 8601 YYYY-MM-DD.  Text output includes zero-padded month and days for single-digit values;
-all text output of @tt{jdate?} is ten characters in length.
+all text representations of @tt{jdate?} are ten characters in length.
 
 @deftogether[(@defthing[MIN-DATE jdate?]
               @defthing[MAX-DATE jdate?])]{
-First and last valid jdate? instances.
+First and last valid @tt{jdate?} instances.
 I figure that no finance stuff before 1700 or
 after I die matters enough to generate unit tests for irrelevent values.
 }
@@ -93,13 +92,13 @@ For instance, 2451545 -> "2001-01-01".
 }
 
 @defproc[(text->jdate [date-text string?]) jdate?]{
-Parse an ISO 8601 YYYY-MM-DD text string into a jdate?.  The content
+Parse an ISO 8601 YYYY-MM-DD text string into a @tt{jdate?}.  The content
 will be verified as a legal date or raise an exception.
 }
 
 @defproc[(->jdate [date-like string?/symbol?/jdate?]) jdate?]{
-Given a symbol or string representation of a jdate?, parse it.  If it is
-a jdate?, it passes through.
+Given a symbol or string representation of a @tt{jdate?}, parse it.  If it is
+a @tt{jdate?}, it passes through.
 }
 
 @defstruct*[ymd ([year integer?][month integer?][day integer?])]{
@@ -112,7 +111,7 @@ From year, month, and day, create a @tt{jdate?}.
 }
 
 @defproc[(jdate->ymd [date jdate?]) ymd?]{
-Return a @tt{ymd?} from jdate?.
+Return a @tt{ymd?} from @tt{jdate?}.
 }
 
 @defproc[(jdate? [object any]) boolean?]{
@@ -512,10 +511,10 @@ signal or allocation.
 
 @defproc[(allocation-equity-line [allocations (listof allocation?) ]
 [#:init initial-value real? 100]) series?]{
-  Rather than a signal based equity-line using signals on dates, an allocation-equity-line specifies
+  Rather than @tt{equity-line}, which uses signals, an @tt{allocation-equity-line} specifies
   portfolio weightings on dates and generates an equity line with respect to the specified
   rebalancings of a portfolio.
-  An allocation structure contains a jdate and a portion? list where a portion struct
+  An allocation structure contains a @tt{jdate?} and a @tt{portion?} list where @tt{portion}
   contains a series and a weight.  For instance, to double-weight a financial ETF (FXO)
   and single-weight an energy sector (FXN) which is rebalanced on the 15th of each month, the
   creation of the equity line might look like:
