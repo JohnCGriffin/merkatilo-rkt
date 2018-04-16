@@ -590,8 +590,8 @@ to consequential drawdowns.  For instance, to find the drawdowns of at least 15%
     The drawdown-residual represents 1 minus the drawdown amount.  For instance, the SP500 lost
     about 55% back in 2008, so its drawdown-residual is about 0.45.
 
-The arrangement of volatility-residual, drawdown-residual
-and annualized-return are arranged such that greater values are better
+The volatility-residual, drawdown-residual
+and annualized-return values are arranged such that greater values are better
 values.  These components will likely suffice to create a goodness
 function that fits your needs.  The long-ratio and trades are
 potentially useful as filters.  For instance, you may decide that any
