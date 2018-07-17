@@ -78,7 +78,8 @@
   (typical-run (λ () TEST-SERIES)
                (λ () (constant 1))
                (λ () (mo TEST-SERIES 5))
-               (λ () (mo-days TEST-SERIES 5))))
+               (λ () (mo-days TEST-SERIES 5)))
+  (typical-benchmark (λ () (mo BENCHMARK-SERIES 100))))
 
 
 ;============================================================

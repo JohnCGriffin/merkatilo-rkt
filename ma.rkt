@@ -51,7 +51,8 @@
   (require "private/test-support.rkt")
   (typical-run
    (λ () TEST-SERIES)
-   (λ () (ma TEST-SERIES 3))))
+   (λ () (ma TEST-SERIES 3)))
+  (typical-benchmark (λ () (ma BENCHMARK-SERIES 10))))
 
 
 ;=====================================================

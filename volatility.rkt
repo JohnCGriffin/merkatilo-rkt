@@ -35,7 +35,8 @@
   (time
    (with-dates TEST-SERIES
      (for ((i 1000))
-       (volatility TEST-SERIES)))))
+       (volatility TEST-SERIES))))
+  (typical-benchmark (λ () (volatility BENCHMARK-SERIES))))
 
 
 ;======================================

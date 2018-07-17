@@ -74,7 +74,8 @@
 
 (module+ main 
   (require "private/test-support.rkt")
-  (typical-run (λ () (ema TEST-SERIES 30))))
+  (typical-run (λ () (ema TEST-SERIES 30)))
+  (typical-benchmark (λ () (ema BENCHMARK-SERIES 20))))
 
 
 

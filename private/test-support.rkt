@@ -5,6 +5,7 @@
 
 
 (provide TEST-SERIES
+         BENCHMARK-SERIES
          AAA-SERIES
          BBB-SERIES
          EMA-3-SERIES
@@ -16,6 +17,7 @@
          MO-5-CONVICTION-4-SERIES
          EQUITYLINE-EMA-10
          typical-run
+         typical-benchmark
          verify-equivalency
          literal-series
          approx
@@ -60,6 +62,18 @@
                       (define val (cadr p))
                       (observation dt val)) date-vals)))
 
+(define (typical-benchmark #:iterations (iterations 100) thunk)
+  (define start (current-inexact-milliseconds))
+  (define end
+    (begin
+      (with-dates (dates BENCHMARK-SERIES)
+        (for ((i (in-range iterations)))
+          (thunk)))
+      (current-inexact-milliseconds)))
+  (define elapsed (- end start))
+  (define millis (/ elapsed iterations))
+  (printf "~a nanos/op\n" (inexact->exact (round (* millis 1000000)))))
+
 (define (typical-run #:iterations (iterations 1000)
                      #:full-dump (full-dump #f)
                      . thunks)
@@ -101,6 +115,7 @@
   (with-input-from-file (format "/tmp/merkatilo-test-data/~a.txt" name)
     (λ () (serialize-in (current-input-port)))))
 
+(define BENCHMARK-SERIES (txt-file-series "benchmark"))
 (define TEST-SERIES (txt-file-series "test-series"))
 (define AAA-SERIES (txt-file-series "aaa"))
 (define BBB-SERIES (txt-file-series "bbb"))
