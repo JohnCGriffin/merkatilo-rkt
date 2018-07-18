@@ -16,9 +16,10 @@
   (define sf (series-function s))
   (define (fudge-function dt)
     (or (sf dt)
-        (for/first ((i (in-range 1 (+ days 1)))
-                    #:when (sf (- dt i)))
-          (sf (- dt i)))))
+        (let loop ((offset 1))
+          (and (<= offset days)
+               (or (sf (- dt offset))
+                   (loop (add1 offset)))))))
   (series fudge-function
           (format "(fudge ~a)" (abbreviate s))))
 
