@@ -35,7 +35,7 @@
     (for ((v0 (in-vector vv))
           (v1 (in-vector vv N))
           (dt (in-vector dv N))
-          #:when (and v1 v0 (not (zero? v0))))
+          #:when (and v1 v0))
       (define result (change v1 v0))
       (when result
         (vector-set! out-v (- dt fd) result))))

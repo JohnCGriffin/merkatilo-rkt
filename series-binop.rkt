@@ -2,6 +2,7 @@
 
 (require
  (combine-in
+  racket/flonum
   "private/common-requirements.rkt"
   "series-map.rkt"
   "constant.rkt"
@@ -34,12 +35,12 @@
                (serify b))
    (format "(~a ~a ~a)" label (abbreviate a) (abbreviate b))))
 
-(define-binop add +)
-(define-binop sub -)
-(define-binop mul *)
+(define-binop add fl+)
+(define-binop sub fl-)
+(define-binop mul fl*)
 (define-binop div (λ (n d)
                     (and (not (zero? d))
-                         (/ n d))))
+                         (fl/ n d))))
 
 
 (define (inequality f2)
