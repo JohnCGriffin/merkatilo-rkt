@@ -4,6 +4,7 @@
 (require
  (combine-in
   (only-in racket/match match)
+  "constant.rkt"
   "private/common-requirements.rkt"))
 
 (provide
@@ -14,34 +15,47 @@
                     series?)]))
 
 
-(define (series-map-1 proc s
+(define (series-map-f-1 proc s
                       #:missing-data-permitted missing-data-permitted)
 
   (define sf (series-function s))
-  (define (calculator dt)
-    (define val (sf dt))
-    (and (or missing-data-permitted
-             val)
-         (proc val)))
-  (series calculator  "to be tossed"))
+  (if missing-data-permitted
+      (λ (dt)
+        (proc (sf dt)))
+      (λ (dt)
+        (define val (sf dt))
+        (and val (proc val)))))
 
-(define (series-map-2 proc a b 
+(define (series-map-f-2 proc a b 
                       #:missing-data-permitted missing-data-permitted)
   (define af (series-function a))
   (define bf (series-function b))
-  (define (calculator dt)
-    (define a-val (af dt))
-    (define b-val (bf dt))
-    (and (or missing-data-permitted
-             (and a-val b-val))
-         (proc a-val b-val)))
-  (series calculator "to be tossed"))
 
-(define (series-map-+ proc series-list
+  ;; A common condition is math with a second constant series and
+  ;; no missing-data-permitted, so optimize remove the constant series call.
+  (cond
+    ((and (constant-series? b)
+          (not missing-data-permitted))
+     (let ((C (bf MIN-DATE)))
+      (λ (dt)
+        (define a-val (af dt))
+        (define b-val (and a-val C))
+        (and b-val (proc a-val b-val)))))
+    (missing-data-permitted
+      (λ (dt)
+        (proc (af dt) (bf dt))))
+    (else
+      (λ (dt)
+        (define a-val (af dt))
+        (define b-val (and a-val (bf dt)))
+        (and b-val (proc a-val b-val))))))
+
+
+(define (series-map-f-+ proc series-list
                       #:missing-data-permitted missing-data-permitted)
   (define cache (make-hasheqv))
   (define funcs (map series-function series-list))
-  (define (calculator dt)
+  (λ (dt)
     (hash-ref! cache
                dt
                (λ ()
@@ -49,8 +63,7 @@
                                 (f dt)))
                  (and (or missing-data-permitted
                           (andmap number? nums))
-                      (apply proc nums)))))
-  (series calculator "to be tossed"))
+                      (apply proc nums))))))
 
 
 (define (series-map proc
@@ -61,16 +74,16 @@
     (raise-user-error 'series-map
                       "~a cannot accept ~a series arguments"
                       proc (length series-list)))
-  (rename-series
+  (series
    (match series-list
      [(list a)
-      (series-map-1 proc a
+      (series-map-f-1 proc a
                     #:missing-data-permitted missing-data-permitted)]
      [(list a b)
-      (series-map-2 proc a b 
+      (series-map-f-2 proc a b 
                     #:missing-data-permitted missing-data-permitted)]
      [_
-      (series-map-+ proc series-list
+      (series-map-f-+ proc series-list
                     #:missing-data-permitted missing-data-permitted)])
    (format "(series-map/~a-series)" (length series-list))))
 
