@@ -30,6 +30,9 @@
   (define benchmarks
     (sort
      (list
+      (bench "window"
+             (let ((wf (λ (v) (for/sum ((n (in-vector v))) n))))
+               (λ () (window-series BENCHMARK-SERIES 200 wf))))
       (bench "fudge"
              (let ((dts (dates (date-range '1980-1-1 '2020-1-1))))
                (λ () (with-dates dts (fudge BENCHMARK-SERIES)))))
