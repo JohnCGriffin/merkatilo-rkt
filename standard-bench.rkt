@@ -7,12 +7,14 @@
 (struct bench (name thunk))
 
 (define (standard-bench)
+
+  (define ITERATIONS 1000)
   
   (define (ops/second thunk)
     (define start (current-inexact-milliseconds))
     (define end
       (begin
-        (for ((i (in-range 100)))
+        (for ((i (in-range ITERATIONS)))
           (define result (thunk))
           (when (series? result)
             (let ((sf (series-function result)))
@@ -20,7 +22,7 @@
                 (sf dt)))))
         (current-inexact-milliseconds)))
     (define seconds (/ (- end start) 1000))
-    (inexact->exact (round (/ 100 seconds))))
+    (inexact->exact (round (/ ITERATIONS seconds))))
 
   (define reusable-ema
     (with-dates BENCHMARK-SERIES
