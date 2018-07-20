@@ -23,3 +23,6 @@ test: merkatilo
 
 version:
 	@git describe --abbrev=0
+
+bench:
+	racket standard-bench.rkt

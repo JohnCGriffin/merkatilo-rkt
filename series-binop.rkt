@@ -35,12 +35,16 @@
                (serify b))
    (format "(~a ~a ~a)" label (abbreviate a) (abbreviate b))))
 
-(define-binop add fl+)
-(define-binop sub fl-)
-(define-binop mul fl*)
+;; Originally, the functions were like +, then fl+.
+;; Benchmarking showed division to be clearly faster even
+;; with a zero? check.  I concluded that specifying a fixed
+;; arity-2 function improved performance by 20%.
+(define-binop add (λ (a b) (+ a b)))
+(define-binop sub (λ (a b) (- a b)))
+(define-binop mul (λ (a b) (* a b)))
 (define-binop div (λ (n d)
                     (and (not (zero? d))
-                         (fl/ n d))))
+                         (/ n d))))
 
 
 (define (inequality f2)
