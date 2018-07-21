@@ -23,14 +23,16 @@
                              (sf dt))))
         (raise-user-error 'overlay "no common dates")))
 
+  (define common-date (ob-d common-ob))
   (define ratio (ob-v common-ob))
 
   (series
    (λ (dt)
      (or (lf dt)
-         (let ((val (sf dt)))
-           (and val
-                (* val ratio)))))
+         (and (< dt common-date)
+              (let ((val (sf dt)))
+                (and val
+                     (* val ratio))))))
    (format "(prepend ~a #:with-surrogate ~a)"
            (abbreviate primary)
            (abbreviate surrogate))))
