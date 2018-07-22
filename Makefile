@@ -25,4 +25,4 @@ version:
 	@git describe --abbrev=0
 
 bench:
-	racket standard-bench.rkt
+	@racket standard-bench.rkt
