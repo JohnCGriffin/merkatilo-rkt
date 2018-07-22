@@ -26,10 +26,11 @@
     ndx)
 
   ; warps signals by N
-  (for ((sig (in-vector sigv))
-        (dt (in-vector dv N))
-        #:when sig)
-    (vector-set! out-v (- dt fd) sig))
+  (when (< N (vector-length dv))
+    (for ((sig (in-vector sigv))
+          (dt (in-vector dv N))
+          #:when sig)
+      (vector-set! out-v (- dt fd) sig)))
 
   (make-vector-series
    #:name (format "(conviction ~a ~a)" (abbreviate s) N)
@@ -68,7 +69,7 @@
            "private/test-support.rkt"
            "signals.rkt"
            "momentum.rkt")
-           
+  
   (define signals
     (with-dates TEST-SERIES
       (to-signals (mo TEST-SERIES 5))))
