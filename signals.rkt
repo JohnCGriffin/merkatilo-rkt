@@ -16,11 +16,20 @@
 (define (to-signals s #:dates (dts (current-dates)))
 
   (define dv (dateset-vector dts))
-  (define vv (signalify-vector-copy (series-dates-values s dv)))
+  (define vv (series-dates-values s dv))
   (define-values (fd out-v)
     (dates-appropriate-fd-and-vec dts))
 
-  (for ((dt (in-vector dv))
+  (for/fold ((prev #f))
+            ((val (in-vector vv))
+             (dt (in-vector dv))
+             #:when val)
+    (define sig (if (< val 0) -1 1))
+    (when (not (eqv? sig prev))
+      (vector-set! out-v (- dt fd) sig))
+    sig)
+
+  #;(for ((dt (in-vector dv))
         (val (in-vector vv))
         #:when val)
     (vector-set! out-v (- dt fd) val))
