@@ -5,7 +5,8 @@
 
 (require "private/common-requirements.rkt"
 	 "private/values-macros.rkt"
-         "first-last-ob.rkt")
+         "first-last-ob.rkt"
+         (only-in racket/unsafe/ops unsafe-fl< unsafe-fl>))
 
 (provide
  (contract-out
@@ -26,8 +27,8 @@
                [max-v (ob-v ob)])
               ((dt (in-vector dv))
                (val (in-vector sv))
-               #:when (and val (or (< val min-v)
-                                   (> val max-v))))
+               #:when (and val (or (unsafe-fl< val min-v)
+                                   (unsafe-fl> val max-v))))
       (if (< val min-v)
           (values dt val max-d max-v)
           (values min-d min-v dt val))))
