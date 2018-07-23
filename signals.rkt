@@ -23,7 +23,7 @@
   (for/fold ((prev #f))
             ((val (in-vector vv))
              (dt (in-vector dv))
-             #:when val)
+             #:when (number? val))
     (define sig (if (< val 0) -1 1))
     (when (not (eqv? sig prev))
       (vector-set! out-v (- dt fd) sig))
