@@ -4,7 +4,8 @@
 ;; observations are available in the dateset, an error is raised.
 
 (require "private/common-requirements.rkt"
-	 "private/values-macros.rkt")
+	 "private/values-macros.rkt"
+         "first-last-ob.rkt")
 
 (provide
  (contract-out
@@ -16,26 +17,20 @@
 (define (min-max-obs s #:dates (dts (current-dates)))
   (define dv (dateset-vector dts))
   (define sv (series-dates-values s dv))
+  (define ob (first-ob s #:dates dts))
   (define-values
     (min-d min-v max-d max-v)
-    (for/fold ([min-d #f]
-               [min-v #f]
-               [max-d #f]
-               [max-v #f])
+    (for/fold ([min-d (ob-d ob)]
+               [min-v (ob-v ob)]
+               [max-d (ob-d ob)]
+               [max-v (ob-v ob)])
               ((dt (in-vector dv))
                (val (in-vector sv))
-               #:when val)
-      (cond
-        ((not min-v)
-         (values dt val dt val))
-        ((< val min-v)
-         (values dt val max-d max-v))
-        ((> val max-v)
-         (values min-d min-v dt val))
-        (else
-         (values min-d min-v max-d max-v)))))
-  (unless min-v
-    (raise-user-error 'min-max-observations "no observations"))
+               #:when (and val (or (< val min-v)
+                                   (> val max-v))))
+      (if (< val min-v)
+          (values dt val max-d max-v)
+          (values min-d min-v dt val))))
 
   (values (observation min-d min-v)
           (observation max-d max-v)))
