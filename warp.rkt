@@ -6,6 +6,7 @@
 
 (require "private/common-requirements.rkt"
          (rename-in racket/unsafe/ops
+                    [ unsafe-vector-set! vector-set! ]
                     [ unsafe-fx+ fx+ ]
                     [ unsafe-fx- fx- ]
                      [ unsafe-fx< fx< ]
@@ -19,19 +20,19 @@
   (define ld (last-date dts))
   (define dv-len (vector-length dv))
 
-  (for ((val (in-vector vv))
-        (ndx (in-naturals))
+  (define-values (dv-start vv-start)
+    (cond
+      ((>= (abs N) dv-len)
+       (values dv-len dv-len))
+      ((< N 0)
+       (values 0 (abs N)))
+      (else
+       (values N 0))))
+
+  (for ((val (in-vector vv vv-start ))
+        (dt (in-vector dv dv-start))
         #:when val)
-    (define warp-ndx (fx+ ndx N))
-    (define target-date (and (fx< -1 warp-ndx)
-                             (fx< warp-ndx dv-len)
-                             (vector-ref dv warp-ndx)))
-    (define target-slot (and target-date
-                             (fx<= fd target-date)
-                             (fx<= target-date ld)
-                             (fx- target-date fd)))
-    (when target-slot
-      (vector-set! out-v target-slot val)))
+    (vector-set! out-v (- dt fd) val))
 
   (make-vector-series
    #:name (format "(warp ~a ~a)" (abbreviate s) N)
