@@ -20,19 +20,14 @@
   (define-values (fd out-v)
     (dates-appropriate-fd-and-vec dts))
 
-  (for/fold ((prev #f))
+  (for/fold ((prev 0))
             ((val (in-vector vv))
-             (dt (in-vector dv))
-             #:when (number? val))
+             (ndx (in-naturals))
+             #:when val)
     (define sig (if (< val 0) -1 1))
-    (when (not (eqv? sig prev))
-      (vector-set! out-v (- dt fd) sig))
+    (when (not (eq? sig prev))
+      (vector-set! out-v (- (vector-ref dv ndx) fd) sig))
     sig)
-
-  #;(for ((dt (in-vector dv))
-        (val (in-vector vv))
-        #:when val)
-    (vector-set! out-v (- dt fd) val))
 
   (make-vector-series
    #:name (format "(to-signals ~a)" (abbreviate s))
