@@ -1,6 +1,8 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt")
+(require "private/common-requirements.rkt"
+         "first-last-ob.rkt"
+         (only-in racket/unsafe/ops unsafe-vector-set!))
 
 (provide
  (contract-out
@@ -10,35 +12,22 @@
 (define (repeated s #:dates (dts (current-dates)) #:repeat-last (repeat-last #f))
   
   (define dv (dateset-vector dts))
-  
   (define vv (series-dates-values s dv))
-  
   (define-values (fd out-v)
     (dates-appropriate-fd-and-vec dts))
-  
-  (define last-valid-slot
-    (for/fold ((last-valid-slot #f))
-	((dt (in-vector dv))
-	 (val (in-vector vv))
-	 #:when val)
-      (define slot (- dt fd))
-      (vector-set! out-v slot val)
-      slot))
-  
 
-  (define stop-slot
-    (and last-valid-slot
-	 (if repeat-last (vector-length out-v) last-valid-slot)))
+  (define boundary-date
+    (if repeat-last
+        (add1 (last-date dts))
+        (add1 (ob-d (last-ob s #:dates dts)))))
 
-  (when stop-slot
-    (for/fold ((last-val #f))
-	((ndx (in-range 0 stop-slot))
-	 (val (in-vector out-v)))
-      (define out-val (or val last-val))
-      (when (and (not val)
-		 out-val)
-	(vector-set! out-v ndx out-val))
-      out-val))
+
+  (for/fold ((last #f))
+            ((dt (in-vector dv))
+             (val (in-vector vv))
+             #:when (< dt boundary-date))
+    (define out-val (or val last))
+    (and (unsafe-vector-set! out-v (- dt fd) out-val) out-val))
 
   (make-vector-series
    #:name (format "(repeated ~a)" (abbreviate s))
