@@ -22,7 +22,6 @@
   (require rackunit
            (submod "..")
            (only-in racket/function curryr)
-	   "series-count.rkt"
            "private/test-support.rkt")
 
   (check-equal?

@@ -1,15 +1,14 @@
 #lang racket/base
 
 (require
- (combine-in
-  "private/common-requirements.rkt"
-  "momentum.rkt"
-  "private/utilities.rkt"))
+  (combine-in
+   "private/common-requirements.rkt"
+   "momentum.rkt"
+   "private/utilities.rkt"))
 
 (provide
  (contract-out
-  [ volatility          (->* (S) (#:days integer? #:dates DS) positive-real?)]
-  #;[ volatility-residual (->* (S) (#:days integer? #:dates DS) positive-real?)]))
+  [ volatility          (->* (S) (#:days integer? #:dates DS) positive-real?)]))
 
 
 

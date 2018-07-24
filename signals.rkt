@@ -42,7 +42,6 @@
 
 (module+ main
   (require "private/test-support.rkt"
-           "series-count.rkt"
            "momentum.rkt")
   (define MO20 (with-dates TEST-SERIES (mo TEST-SERIES 20)))
   (typical-run (λ () MO20)

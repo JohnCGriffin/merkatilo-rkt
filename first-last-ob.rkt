@@ -32,11 +32,7 @@
 
 (module* test racket/base
   (require rackunit
-           racket/vector
            (submod "..")
-           "series-binop.rkt"
-           "warp.rkt"
-           "private/series-dates-values.rkt"
            "private/test-support.rkt")
 
 

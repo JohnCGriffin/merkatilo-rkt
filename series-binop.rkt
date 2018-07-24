@@ -1,12 +1,12 @@
 #lang racket/base
 
 (require
- (combine-in
-  racket/flonum
-  "private/common-requirements.rkt"
-  "series-map.rkt"
-  "constant.rkt"
-  (only-in "private/contracts.rkt" binop?)))
+  (combine-in
+   racket/flonum
+   "private/common-requirements.rkt"
+   "series-map.rkt"
+   "constant.rkt"
+   (only-in "private/contracts.rkt" binop?)))
 
 
 (provide
@@ -73,7 +73,6 @@
 (module* test racket/base
   (require rackunit
            (submod "..")
-           "series-count.rkt"
            "series-map.rkt"
            "private/test-support.rkt")
 

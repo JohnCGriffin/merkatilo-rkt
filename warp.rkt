@@ -9,8 +9,8 @@
                     [ unsafe-vector-set! vector-set! ]
                     [ unsafe-fx+ fx+ ]
                     [ unsafe-fx- fx- ]
-                     [ unsafe-fx< fx< ]
-                     [ unsafe-fx<= fx<= ]))
+                    [ unsafe-fx< fx< ]
+                    [ unsafe-fx<= fx<= ]))
 
 (provide (contract-out [ warp (->* (S integer?) (#:dates DS) S) ]))
 
@@ -47,8 +47,8 @@
 (module+ main
   (require "private/test-support.rkt")
   (typical-run #:iterations 1000
-   (λ () TEST-SERIES)
-   (λ () (warp TEST-SERIES 2))))
+               (λ () TEST-SERIES)
+               (λ () (warp TEST-SERIES 2))))
 
 
 ;===============================================

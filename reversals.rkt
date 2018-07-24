@@ -37,28 +37,28 @@
           (max-val (mms-max-v state))
           (mode (mms-mode state)))
       
-    (cond
-      ((and (not (eqv? 1 mode))
-            (> val (* min-val up-factor)))
-       (let ((date (if nostradamus (mms-min-d state) dt)))
-         (vector-set! out-v (- date fd) 1)
-         (mms dt val dt val 1)))
+      (cond
+        ((and (not (eqv? 1 mode))
+              (> val (* min-val up-factor)))
+         (let ((date (if nostradamus (mms-min-d state) dt)))
+           (vector-set! out-v (- date fd) 1)
+           (mms dt val dt val 1)))
 
 
-      ((and (not (eqv? -1 mode))
-            (< val (* max-val down-factor)))
-       (let ((date (if nostradamus (mms-max-d state) dt)))
-         (vector-set! out-v (- date fd) -1)
-         (mms dt val dt val -1)))
+        ((and (not (eqv? -1 mode))
+              (< val (* max-val down-factor)))
+         (let ((date (if nostradamus (mms-max-d state) dt)))
+           (vector-set! out-v (- date fd) -1)
+           (mms dt val dt val -1)))
 
-      ((< val min-val)
-       (mms dt val (mms-max-d state) max-val mode))
+        ((< val min-val)
+         (mms dt val (mms-max-d state) max-val mode))
 
-      ((> val max-val)
-       (mms (mms-min-d state) min-val dt val mode))
+        ((> val max-val)
+         (mms (mms-min-d state) min-val dt val mode))
 
-      (else
-       state))))
+        (else
+         state))))
 
   (make-vector-series
    #:name (format "(~a ~a ~a ~a)"
@@ -94,9 +94,7 @@
 ;=================================================
 
 (module* main #f
-  (require "private/test-support.rkt"
-           "series-logic.rkt"
-           "dump.rkt")
+  (require "private/test-support.rkt")
   (typical-run
    #:full-dump #t
    (λ () (nostradamus TEST-SERIES #:down-factor .95 #:up-factor 1.05))

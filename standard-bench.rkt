@@ -1,7 +1,6 @@
 #lang racket/base
 
 (require "main.rkt"
-         "private/common-requirements.rkt"
          "private/test-support.rkt")
 
 (struct bench (name thunk))

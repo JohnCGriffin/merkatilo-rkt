@@ -40,10 +40,7 @@
          (struct-out series))
 
 (require racket/list
-         racket/file
-         racket/string
-         "memoize.rkt"
-         "series-dates-values.rkt"
+          "series-dates-values.rkt"
          "../core/jdate.rkt"
          "../core/series.rkt"
          "../core/dates.rkt"

@@ -1,14 +1,9 @@
 #lang racket/base
 
 (provide average
-         fontkodo-mean
          standard-deviation
 	 signalify-vector-copy)
 
-
-(require (only-in racket/vector 
-                  vector-map
-                  vector-copy))
 
 (require (rename-in racket/unsafe/ops [ unsafe-fl* fl* ]))
 
@@ -26,19 +21,6 @@
     sig)
   copy)
 
-
-(define (fontkodo-mean e nums)
-  (cond
-    ((vector? nums)
-     (fontkodo-mean e (vector->list nums)))
-    ((zero? e)
-     (expt (apply * nums)
-           (/ (length nums))))
-    (else
-     (expt (/ (for/sum ((n (in-list nums)))
-                (expt n e))
-              (length nums))
-           (/ e)))))
 
 (define (average vec)
   (define-values (N total)
