@@ -4,7 +4,6 @@
 ;; observations are available in the dateset, an error is raised.
 
 (require "private/common-requirements.rkt"
-	 "private/values-macros.rkt"
          "first-last-ob.rkt")
 
 (provide
@@ -37,10 +36,12 @@
 
 
 (define (min-ob s #:dates (dts (current-dates)))
-  (first-of-values (min-max-obs s #:dates dts)))
+  (define-values (result _) (min-max-obs s #:dates dts))
+  result)
 
 (define (max-ob s #:dates (dts (current-dates)))
-  (second-of-values (min-max-obs s #:dates dts)))
+  (define-values (_ result) (min-max-obs s #:dates dts))
+  result)
 
 
 

@@ -8,9 +8,8 @@
 
 
 (require
- (combine-in
-  (only-in racket/contract contract-out -> ->* any/c or/c and/c between/c)
-  "../private/memoize.rkt"))
+  (combine-in
+   (only-in racket/contract contract-out -> ->* any/c or/c and/c between/c)))
 
 (provide
  (except-out (struct-out ymd) ymd)
@@ -123,46 +122,60 @@
   (remainder (add1 dt) 7))
 
 (define jdate->text
-  (memoize
-   (λ (dt)             
-     (define (pad num)
-       (if (> num 9) num (format "0~a" num)))
-     (define X (jdate->ymd dt))
-     (format "~a-~a-~a"
-             (ymd-year X)
-             (pad (ymd-month X))
-             (pad (ymd-day X))))))
-
+  ((λ ()
+     (define (construct-date dt)             
+       (define (pad num)
+         (if (> num 9) num (format "0~a" num)))
+       (define X (jdate->ymd dt))
+       (format "~a-~a-~a"
+               (ymd-year X)
+               (pad (ymd-month X))
+               (pad (ymd-day X))))
+     (let ((lookup (hash)))
+       (λ (dt)
+         (or (hash-ref lookup dt #f)
+             (let ((result (construct-date dt)))
+               (set! lookup (hash-set lookup dt result))
+               result)))))))
 
 (define text->jdate
-  (memoize
-   (λ (date-string)
-     (define CHAR-ZERO (char->integer #\0))
-     (define CHAR-NINE (char->integer #\9))
-     (define (digit c)
-       (define val (char->integer c))
-       (cond
-         ((<= CHAR-ZERO val CHAR-NINE) (- val CHAR-ZERO))
-         ((eqv? #\- c) #f)
-         (else (raise-user-error 'text->jdate "bad character in text->date"))))
+  ((λ ()
      
-     (let loop ((digits (string->list date-string))
-                (y 0)
-                (m 0)
-                (d 0)
-                (state 0))
-       (if (null? digits)
-           (ymd->jdate y m d)
-           (let ((val (digit (car digits))))
-             (cond
-               ((not val)
-                (loop (cdr digits) y m d (+ state 1)))
-               ((eqv? state 2)
-                (loop (cdr digits) y m (+ val (* d 10)) state))
-               ((eqv? state 0)
-                (loop (cdr digits) (+ val (* y 10)) m d state))
-               ((eqv? state 1)
-                (loop (cdr digits) y (+ val (* m 10)) d state)))))))))
+     (define (parse date-string)
+       (define CHAR-ZERO (char->integer #\0))
+       (define CHAR-NINE (char->integer #\9))
+       (define (digit c)
+         (define val (char->integer c))
+         (cond
+           ((<= CHAR-ZERO val CHAR-NINE) (- val CHAR-ZERO))
+           ((eqv? #\- c) #f)
+           (else (raise-user-error 'text->jdate "bad character in text->date"))))
+     
+       (let loop ((digits (string->list date-string))
+                  (y 0)
+                  (m 0)
+                  (d 0)
+                  (state 0))
+         (if (null? digits)
+             (ymd->jdate y m d)
+             (let ((val (digit (car digits))))
+               (cond
+                 ((not val)
+                  (loop (cdr digits) y m d (+ state 1)))
+                 ((eqv? state 2)
+                  (loop (cdr digits) y m (+ val (* d 10)) state))
+                 ((eqv? state 0)
+                  (loop (cdr digits) (+ val (* y 10)) m d state))
+                 ((eqv? state 1)
+                  (loop (cdr digits) y (+ val (* m 10)) d state)))))))
+     
+     (let ((lookup (hash)))
+       (λ (date-string)
+         (or (hash-ref lookup date-string #f)
+             (let ((result (parse date-string)))
+               (set! lookup (hash-set lookup date-string result))
+               result)))))))
+
 
 (define (today (days-offset 0))
   (define now (seconds->date (current-seconds)))
