@@ -9,9 +9,7 @@
 
 (require "private/common-requirements.rkt"
 	 "first-last-ob.rkt"
-         (rename-in racket/unsafe/ops
-                    [ unsafe-fx<= fx<= ]
-                    [ unsafe-fx- fx- ]))
+         (only-in racket/fixnum fx<= fx-))
 
 (provide
  (contract-out

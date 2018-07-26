@@ -5,12 +5,8 @@
 ;; calculating trades on the next market day.
 
 (require "private/common-requirements.rkt"
-         (rename-in racket/unsafe/ops
-                    [ unsafe-vector-set! vector-set! ]
-                    [ unsafe-fx+ fx+ ]
-                    [ unsafe-fx- fx- ]
-                    [ unsafe-fx< fx< ]
-                    [ unsafe-fx<= fx<= ]))
+         (only-in racket/unsafe/ops unsafe-vector-set!)
+         (only-in racket/fixnum fx+ fx- fx< fx<=))
 
 (provide (contract-out [ warp (->* (S integer?) (#:dates DS) S) ]))
 
@@ -32,7 +28,7 @@
   (for ((val (in-vector vv vv-start ))
         (dt (in-vector dv dv-start))
         #:when val)
-    (vector-set! out-v (- dt fd) val))
+    (unsafe-vector-set! out-v (- dt fd) val))
 
   (make-vector-series
    #:name (format "(warp ~a ~a)" (abbreviate s) N)

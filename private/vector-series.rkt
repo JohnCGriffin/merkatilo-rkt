@@ -3,7 +3,8 @@
 (require "../core/series.rkt"
          "../core/dates.rkt"
          "../core/jdate.rkt"
-         (only-in racket/unsafe/ops unsafe-vector-ref unsafe-fx<=)
+         (only-in racket/fixnum fx+ fx- fx<=)
+         (only-in racket/unsafe/ops unsafe-vector-ref)
          (only-in racket/contract contract-out ->))
 
 (provide
@@ -44,11 +45,11 @@
                             #:vector vec
                             #:name name)
   (define final-v (vector->immutable-vector vec))
-  (define ld (sub1 (+ fd (vector-length vec))))
+  (define ld (sub1 (fx+ fd (vector-length vec))))
   (define (F dt)
-    (and (unsafe-fx<= fd dt)
-         (unsafe-fx<= dt ld)
-         (unsafe-vector-ref final-v (- dt fd))))
+    (and (fx<= fd dt)
+         (fx<= dt ld)
+         (unsafe-vector-ref final-v (fx- dt fd))))
   (vector-series F name fd ld final-v #f))
 
 (define (dates-appropriate-fd-and-vec dts)
