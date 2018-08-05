@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide standard-deviation
+(provide (rename-out [one-pass-standard-deviation standard-deviation])
 	 signalify-vector-copy)
 
 
@@ -23,7 +23,20 @@
 
 
 
-(define (standard-deviation vec)
+(define (one-pass-standard-deviation vec)
+  (for/fold ((N 0)
+             (total 0.0)
+             (total² 0.0)
+             #:result (and (not (zero? total²))
+                           (sqrt (/ (- total² (/ (* total total) N)) N))))
+            ((n (in-vector vec))
+             #:when n)
+    (values (add1 N)
+            (+ n total)
+            (+ (* n n) total²))))
+
+
+#;(define (standard-deviation vec)
 
   (define-values (N total)
     (for/fold ((N 0)
