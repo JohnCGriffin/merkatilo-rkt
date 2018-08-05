@@ -25,28 +25,28 @@
 
 (define (one-pass-standard-deviation vec)
   (for/fold ((N 0)
-             (total 0.0)
-             (total² 0.0)
-             #:result (and (not (zero? total²))
-                           (sqrt (/ (- total² (/ (* total total) N)) N))))
+             (t 0.0)
+             (t² 0.0)
+             #:result (and (not (zero? t²))
+                           (sqrt (/ (- t² (/ (* t t) N)) N))))
             ((n (in-vector vec))
              #:when n)
     (values (add1 N)
-            (+ n total)
-            (+ (* n n) total²))))
+            (+ n t)
+            (+ (* n n) t²))))
 
 
-#;(define (standard-deviation vec)
+#;(define (two-pass-standard-deviation vec)
 
-  (define-values (N total)
+  (define-values (N t)
     (for/fold ((N 0)
-               (total 0.0))
+               (t 0.0))
               ((n (in-vector vec)) #:when n)
       (values (add1 N)
-              (+ total n))))
+              (+ t n))))
 
   (define mean (and (positive? N)
-                    (real->double-flonum (/ total N))))
+                    (real->double-flonum (/ t N))))
   
   (define avg-squared-diff
     (and mean
