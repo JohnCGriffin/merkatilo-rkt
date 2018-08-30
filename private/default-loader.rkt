@@ -34,7 +34,9 @@
   (define data-source (hash-ref (force loader-config-promise) 'data-source))
   (define data-source-regex (pregexp (hash-ref data-source 'regex)))
   (define data-source-replacement (hash-ref data-source 'replacement))
-  (define data-source-headers (hash-ref data-source 'headers '()))
+  (define data-source-headers
+    (for/list (((k v) (in-hash (hash-ref data-source 'headers '{}))))
+      (format "~a:~a" k v)))
 
   (define the-url
     (string->url
