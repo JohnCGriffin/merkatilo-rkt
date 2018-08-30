@@ -15,8 +15,18 @@
   [ default-loader (-> series-name? series?)]))
 
 (define loader-config-promise
-  (delay 
-    (call-with-input-file "/etc/merkatilo/default-loader-config.json" read-json)))
+  (let* ((file-name "default-loader-config.json")
+         (personal-config (format "~a/.merkatilo/~a"
+                                  (path->string (find-system-path 'home-dir))
+                                  file-name))
+         (config-file (or (and (file-exists? personal-config)
+                               personal-config)
+                          (format "/etc/merkatilo/~a" file-name))))
+    (delay
+      (if (file-exists? config-file)
+          (call-with-input-file config-file read-json)
+          (raise-user-error
+           (format "failed to find ~a in user's home directory or in /etc/merkatilo" file-name))))))
 
 
 (define (worker id)
@@ -24,13 +34,14 @@
   (define data-source (hash-ref (force loader-config-promise) 'data-source))
   (define data-source-regex (pregexp (hash-ref data-source 'regex)))
   (define data-source-replacement (hash-ref data-source 'replacement))
+  (define data-source-headers (hash-ref data-source 'headers '()))
 
   (define the-url
     (string->url
      (regexp-replace data-source-regex id data-source-replacement)))
 
   (serialize-in
-   (get-pure-port the-url)))
+   (get-pure-port the-url data-source-headers)))
 
 (struct expiring-item (expiration item))
 
