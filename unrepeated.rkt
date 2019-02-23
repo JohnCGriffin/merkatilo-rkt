@@ -1,7 +1,6 @@
 #lang racket/base
 
-(require "private/common-requirements.rkt"
-         (only-in racket/unsafe/ops unsafe-vector-set!))
+(require "private/common-requirements.rkt")
 
 (provide
  (contract-out
@@ -15,8 +14,8 @@
   (for/fold ((prev #f))
             ((dt (in-vector dv))
              (val (in-vector vv)))
-    (unless (eqv? prev val)
-      (unsafe-vector-set! out-v (- dt fd) val))
+    (unless (and val (eqv? prev val))
+      (vector-set! out-v (- dt fd) val))
     val)
 
   (make-vector-series
