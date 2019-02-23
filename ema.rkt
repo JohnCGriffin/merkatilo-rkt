@@ -18,7 +18,6 @@
  (combine-in
   "private/common-requirements.rkt"
   (only-in "private/contracts.rkt" periodic?)
-  (only-in racket/fixnum fx-)
   (only-in racket/contract <=/c)))
 
 
@@ -37,17 +36,31 @@
   (define-values (dv vv fd out-v) (common-setup s dts))
   (define fraction (* 1.0 _fraction))
   (define prev-fraction (- 1.0 fraction))
+  (define len (vector-length vv))
 
-  (for/fold ((prev #f))
-            ((dt (in-vector dv))
-             (val (in-vector vv)))
-    (let ((next (if (and val prev)
-                    (+ (* fraction val)
-                       (* prev-fraction prev))
-                    val)))
-      (when val
-        (vector-set! out-v (fx- dt fd) next))
-      next))
+  (let loop ((prev #f)
+             (ndx 0))
+    (and (< ndx len)
+         (let* ((val (vector-ref vv ndx))
+                (next (if (and val prev)
+                          (+ (* fraction val)
+                             (* prev-fraction prev))
+                          val))
+                (dt (and next (vector-ref dv ndx))))
+           (when dt
+             (vector-set! out-v (- dt fd) next))
+           (loop next (add1 ndx)))))
+  
+  #;(for/fold ((prev #f))
+              ((dt (in-vector dv))
+               (val (in-vector vv)))
+      (let ((next (if (and val prev)
+                      (+ (* fraction val)
+                         (* prev-fraction prev))
+                      val)))
+        (when val
+          (vector-set! out-v (- dt fd) next))
+        next))
 
   (make-vector-series
    #:first-date fd

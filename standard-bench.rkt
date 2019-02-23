@@ -70,6 +70,7 @@
       (let ((name (substring (format "~a              "
                                      (bench-name b)) 0 12))
             (ops (ops/second (bench-thunk b))))
+        (collect-garbage)
         (printf "~a\t~a\n" name ops)))))
 
 (module+ main

@@ -4,16 +4,13 @@
 ;; when N is negative).  A typical use would be to warp signal data for
 ;; calculating trades on the next market day.
 
-(require "private/common-requirements.rkt"
-         (only-in racket/unsafe/ops unsafe-vector-set!)
-         (only-in racket/fixnum fx+ fx- fx< fx<=))
+(require "private/common-requirements.rkt")
 
 (provide (contract-out [ warp (->* (S integer?) (#:dates DS) S) ]))
 
 (define (warp s N #:dates (dts (current-dates)))
 
   (define-values (dv vv fd out-v) (common-setup s dts))
-  (define ld (last-date dts))
   (define dv-len (vector-length dv))
 
   (define-values (dv-start vv-start)
@@ -28,7 +25,7 @@
   (for ((val (in-vector vv vv-start ))
         (dt (in-vector dv dv-start))
         #:when val)
-    (unsafe-vector-set! out-v (- dt fd) val))
+    (vector-set! out-v (- dt fd) val))
 
   (make-vector-series
    #:name (format "(warp ~a ~a)" (abbreviate s) N)

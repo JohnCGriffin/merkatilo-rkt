@@ -3,7 +3,6 @@
 (require
  (combine-in
   "private/common-requirements.rkt"
-  (only-in racket/fixnum fx-)
   (only-in racket/unsafe/ops unsafe-vector-ref unsafe-vector-set!)
   (only-in "private/contracts.rkt" periodic?)))
             
@@ -29,7 +28,7 @@
                             0))
                (new-total (- (+ total val) to-drop)))
           (when (>= consecutive (sub1 N))
-            (unsafe-vector-set! out-v (fx- dt fd) (/ new-total fN)))
+            (unsafe-vector-set! out-v (- dt fd) (/ new-total fN)))
           (values new-total (add1 consecutive)))))
 
   (make-vector-series

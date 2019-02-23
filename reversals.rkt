@@ -23,42 +23,44 @@
   (define-values (dv vv fd out-v) (common-setup s dts))
 
   (define init-ob (first-ob s #:dates dts))
+  (define len (vector-length vv))
 
-  (for/fold ((state (mms (ob-d init-ob)
-                         (ob-v init-ob)
-                         (ob-d init-ob)
-                         (ob-v init-ob)
-                         #f)))
-            ((dt (in-vector dv))
-             (val (in-vector vv))
-             #:when val)
+  (let loop ((min-d (ob-d init-ob))
+             (min-v (ob-v init-ob))
+             (max-d (ob-d init-ob))
+             (max-v (ob-v init-ob))
+             (mode 0)
+             (ndx 0))
 
-    (let ((min-val (mms-min-v state))
-          (max-val (mms-max-v state))
-          (mode (mms-mode state)))
-      
-      (cond
-        ((and (not (eqv? 1 mode))
-              (> val (* min-val up-factor)))
-         (let ((date (if nostradamus (mms-min-d state) dt)))
-           (vector-set! out-v (- date fd) 1)
-           (mms dt val dt val 1)))
+    (and (< ndx len)
+         (let* ((val (vector-ref vv ndx))
+                (dt (and val (vector-ref dv ndx))))
+           (cond
 
+             ((not val)
+              (loop min-d min-v max-d max-v mode (add1 ndx)))
+             
+             ((and (< mode 1)
+                   (> val (* min-v up-factor)))
+              (let ((date (if nostradamus min-d dt)))
+                (vector-set! out-v (- date fd) 1)
+                (loop dt val dt val 1 (add1 ndx))))
+             
+             ((and (> mode -1)
+                   (< val (* max-v down-factor)))
+              (let ((date (if nostradamus max-d dt)))
+                (vector-set! out-v (- date fd) -1)
+                (loop dt val dt val -1 (add1 ndx))))
+             
+             ((< val min-v)
+              (loop dt val max-d max-v mode (add1 ndx)))
+             
+             ((> val max-v)
+              (loop min-d min-v dt val mode (add1 ndx)))
+             
+             (else
+              (loop min-d min-v max-d max-v mode (add1 ndx)))))))
 
-        ((and (not (eqv? -1 mode))
-              (< val (* max-val down-factor)))
-         (let ((date (if nostradamus (mms-max-d state) dt)))
-           (vector-set! out-v (- date fd) -1)
-           (mms dt val dt val -1)))
-
-        ((< val min-val)
-         (mms dt val (mms-max-d state) max-val mode))
-
-        ((> val max-val)
-         (mms (mms-min-d state) min-val dt val mode))
-
-        (else
-         state))))
 
   (make-vector-series
    #:name (format "(~a ~a ~a ~a)"

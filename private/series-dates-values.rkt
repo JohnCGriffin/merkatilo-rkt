@@ -5,7 +5,6 @@
 (require
  (combine-in
   (only-in racket/vector vector-map)
-  (only-in racket/fixnum fx<=)
   (only-in racket/unsafe/ops unsafe-vector-ref unsafe-vector-set!)
   "../core/series.rkt"
   "vector-series.rkt"))
@@ -18,8 +17,8 @@
     (for ((dt (in-vector dv))
           (ndx (in-naturals)))
       (define val
-        (and (fx<= fd dt)
-             (fx<= dt ld)
+        (and (<= fd dt)
+             (<= dt ld)
              (unsafe-vector-ref vec (- dt fd))))
       (unsafe-vector-set! out-v ndx val))
     (vector->immutable-vector out-v)))
