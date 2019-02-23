@@ -1,8 +1,7 @@
 #lang racket/base
 
 (require "private/common-requirements.rkt"
-         "first-last-ob.rkt"
-         (only-in racket/unsafe/ops unsafe-vector-set!))
+         "first-last-ob.rkt")
 
 (provide
  (contract-out
@@ -27,7 +26,7 @@
              (val (in-vector vv))
              #:when (< dt boundary-date))
     (define out-val (or val last))
-    (and (unsafe-vector-set! out-v (- dt fd) out-val) out-val))
+    (and (vector-set! out-v (- dt fd) out-val) out-val))
 
   (make-vector-series
    #:name (format "(repeated ~a)" (abbreviate s))

@@ -4,9 +4,6 @@
 	 signalify-vector-copy)
 
 
-(require
- (only-in racket/unsafe/ops unsafe-fl*))
-
 
 ; Signals are either negative or non-negative
 (define (signalify-vector-copy v)
@@ -36,25 +33,3 @@
             (+ (* n n) t²))))
 
 
-#;(define (two-pass-standard-deviation vec)
-
-  (define-values (N t)
-    (for/fold ((N 0)
-               (t 0.0))
-              ((n (in-vector vec)) #:when n)
-      (values (add1 N)
-              (+ t n))))
-
-  (define mean (and (positive? N)
-                    (real->double-flonum (/ t N))))
-  
-  (define avg-squared-diff
-    (and mean
-         (/ (for/sum ((n (in-vector vec))
-                      #:when n)
-              (define diff (- n mean))
-              (unsafe-fl* diff diff))
-            N)))
-  
-  (and avg-squared-diff
-       (sqrt avg-squared-diff)))

@@ -3,7 +3,6 @@
 (require "../core/series.rkt"
          "../core/dates.rkt"
          "../core/jdate.rkt"
-         (only-in racket/unsafe/ops unsafe-vector-ref)
          (only-in racket/contract contract-out ->))
 
 (provide
@@ -48,7 +47,7 @@
   (define (F dt)
     (and (<= fd dt)
          (<= dt ld)
-         (unsafe-vector-ref final-v (- dt fd))))
+         (vector-ref final-v (- dt fd))))
   (vector-series F name fd ld final-v #f))
 
 (define (dates-appropriate-fd-and-vec dts)
