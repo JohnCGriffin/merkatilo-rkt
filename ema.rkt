@@ -38,20 +38,7 @@
   (define prev-fraction (- 1.0 fraction))
   (define len (vector-length vv))
 
-  (let loop ((prev #f)
-             (ndx 0))
-    (and (< ndx len)
-         (let* ((val (vector-ref vv ndx))
-                (next (if (and val prev)
-                          (+ (* fraction val)
-                             (* prev-fraction prev))
-                          val))
-                (dt (and next (vector-ref dv ndx))))
-           (when dt
-             (vector-set! out-v (- dt fd) next))
-           (loop next (add1 ndx)))))
-  
-  #;(for/fold ((prev #f))
+  (for/fold ((prev #f))
               ((dt (in-vector dv))
                (val (in-vector vv)))
       (let ((next (if (and val prev)
