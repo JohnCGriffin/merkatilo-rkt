@@ -23,7 +23,6 @@
   (define-values (dv vv fd out-v) (common-setup s dts))
 
   (define init-ob (first-ob s #:dates dts))
-  (define len (vector-length vv))
 
   (let ((min-d (ob-d init-ob))
         (min-v (ob-v init-ob))
