@@ -51,20 +51,13 @@
    #:first-date fd))
 
 (define (mo-days s days #:dates (dts (current-dates)))
-  (define-values (dv vv fd out-v) (common-setup s dts))
+  (define sf (series-function s))
   (define ff (series-function (fudge s)))
-
-  (for ((val (in-vector vv))
-        (dt (in-vector dv))
-        #:when val)
-    (define result (change val (ff (- dt days))))
-    (when result
-      (vector-set! out-v (- dt fd) result)))
-
-  (make-vector-series
-   #:name (format "(mo-days ~a ~a)" (abbreviate s) days)
-   #:vector out-v
-   #:first-date fd))
+  (series
+   (λ (dt)
+     (change (sf dt)
+             (ff (- dt days))))
+   (format "(mo-days ~a ~a)" (abbreviate s) days)))
 
 
 
