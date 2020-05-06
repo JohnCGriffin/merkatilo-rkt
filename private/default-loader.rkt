@@ -35,7 +35,7 @@
   (define data-source-regex (pregexp (hash-ref data-source 'regex)))
   (define data-source-replacement (hash-ref data-source 'replacement))
   (define data-source-headers
-    (for/list (((k v) (in-hash (hash-ref data-source 'headers '{}))))
+    (for/list (((k v) (in-hash (hash-ref data-source 'headers (hash)))))
       (format "~a:~a" k v)))
 
   (define the-url

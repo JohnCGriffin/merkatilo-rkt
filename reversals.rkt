@@ -23,43 +23,38 @@
   (define-values (dv vv fd out-v) (common-setup s dts))
 
   (define init-ob (first-ob s #:dates dts))
-  (define len (vector-length vv))
 
-  (let loop ((min-d (ob-d init-ob))
-             (min-v (ob-v init-ob))
-             (max-d (ob-d init-ob))
-             (max-v (ob-v init-ob))
-             (mode 0)
-             (ndx 0))
+  (let ((min-d (ob-d init-ob))
+        (min-v (ob-v init-ob))
+        (max-d (ob-d init-ob))
+        (max-v (ob-v init-ob))
+        (mode 0))
 
-    (and (< ndx len)
-         (let* ((val (vector-ref vv ndx))
-                (dt (and val (vector-ref dv ndx))))
-           (cond
+    (for ((dt (in-vector dv))
+          (val (in-vector vv))
+          #:when val)
 
-             ((not val)
-              (loop min-d min-v max-d max-v mode (add1 ndx)))
+      (cond
+
+        ((and (< mode 1)
+              (> val (* min-v up-factor)))
+         (let ((date (if nostradamus min-d dt)))
+           (vector-set! out-v (- date fd) 1)
+           (set!-values (min-d min-v max-d max-v mode)
+                        (values dt val dt val 1))))
              
-             ((and (< mode 1)
-                   (> val (* min-v up-factor)))
-              (let ((date (if nostradamus min-d dt)))
-                (vector-set! out-v (- date fd) 1)
-                (loop dt val dt val 1 (add1 ndx))))
-             
-             ((and (> mode -1)
-                   (< val (* max-v down-factor)))
-              (let ((date (if nostradamus max-d dt)))
-                (vector-set! out-v (- date fd) -1)
-                (loop dt val dt val -1 (add1 ndx))))
-             
-             ((< val min-v)
-              (loop dt val max-d max-v mode (add1 ndx)))
-             
-             ((> val max-v)
-              (loop min-d min-v dt val mode (add1 ndx)))
-             
-             (else
-              (loop min-d min-v max-d max-v mode (add1 ndx)))))))
+        ((and (> mode -1)
+              (< val (* max-v down-factor)))
+         (let ((date (if nostradamus max-d dt)))
+           (vector-set! out-v (- date fd) -1)
+           (set!-values (min-d min-v max-d max-v mode)
+                        (values dt val dt val -1))))
+
+        ((< val min-v)
+         (set!-values (min-d min-v) (values dt val)))
+
+        ((> val max-v)
+         (set!-values (max-d max-v) (values dt val))))))
 
 
   (make-vector-series
